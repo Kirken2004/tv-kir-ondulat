@@ -1,5 +1,5 @@
 # tv-kir-ondulat
-Pine script for Trading View about Hodosa N-Wave
+Pine script for Trading View about Hosoda N-Wave
 
     This indicator is an amateur exercise. 
 
