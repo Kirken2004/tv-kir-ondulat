@@ -1,10 +1,14 @@
 # tv-kir-ondulat
-Pine script for Trading View about Hosoda N-Wave
+Pine script for Trading View about an Hosoda N-Wave indicator 
 
     This indicator is an amateur exercise. 
 
     THIS IS NOT AN ADVICE IN TRADING OR INVESTMENT. 
     USE, MODIFY, REDUCE, AUGMENT IT AT YOUR OWN RISK AND EXPENSE. 
+
+## Screenshot
+
+![alt text](https://github.com/Kirken2004/tv-kir-ondulat/blob/develop/preview.jpg?raw=true)
 
 ## Disclaimer
 
@@ -12,7 +16,8 @@ Pine script for Trading View about Hosoda N-Wave
     This license apply to the modification and redistribution of the script. 
     It does not apply to the use of it. 
     
-    For using this script inside Trading View, you may refer to the license under which Trading View and PineCoders are ruled. 
+    For using this script inside Trading View, you may refer to 
+    the license under which Trading View and PineCoders are covered. 
 
 
 It's my first pine script ever. Be kind.
@@ -65,6 +70,8 @@ Above that, arrows **N, V, E and NT** can still show potential targets.
 
 When the market is strongly bullish or bearish, it's not unusual to watch the price go crazy above or below the window. In such case, the chart may follow a strength arrow that is a multiple of **E** or **N**. That's why this script has an option to display those multiples. 
 
+The **SLP** stands for **Stupid Linear Prediction**. It's really just the direction the chart is heading into from the C point to now (now being the last confirmed bar). It has no real value but in your dreams. The calculated value shown in the purple label is the market price this chart would end up at if continuing in that direction, at the **Target Time**.
+
 
 ## F.A.Q.
 
@@ -85,7 +92,7 @@ I watched a presentation on Twitch about the undulatory theory of Hosoda. The st
 No. Probably not.
 
 
-## CONTACT
+## Contact
 
     None.
     

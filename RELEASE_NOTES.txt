@@ -1,3 +1,12 @@
-v0.9.0 - 03-16-2024
+VERSION HISTORY
 
-    - first release on GitHub
+    v0.9.1 - 03-16-2024
+
+        - added a screenshot to the readme and the repo
+        - fixed some unfortunate typos
+        - changed the SLP label alignment from right to left
+        - added an explanation about the SLP
+
+    v0.9.0 - 03-16-2024
+
+        - first release on GitHub
