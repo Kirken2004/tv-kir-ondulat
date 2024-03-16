@@ -1,5 +1,5 @@
 # tv-kir-ondulat
-Pine script for Trading View about Hosoda N-Wave
+Pine script for Trading View about an Hosoda N-Wave indicator 
 
     This indicator is an amateur exercise. 
 
@@ -12,7 +12,8 @@ Pine script for Trading View about Hosoda N-Wave
     This license apply to the modification and redistribution of the script. 
     It does not apply to the use of it. 
     
-    For using this script inside Trading View, you may refer to the license under which Trading View and PineCoders are ruled. 
+    For using this script inside Trading View, you may refer to 
+    the license under which Trading View and PineCoders are covered. 
 
 
 It's my first pine script ever. Be kind.
