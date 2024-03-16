@@ -366,7 +366,7 @@ drawSLP(Wave t) =>
         var timeAtOvershoot = t.currentTime + (nBarOvershoot * nb_seconds * 1000)
         var slpPrice = t.price3 + ((t.currentPrice - t.price3)*(timeAtOvershoot - t.time3))/(t.currentTime - t.time3)
 
-        label.new(t.currentTime, na, "SLP=" + formatPrice(predi), xloc.bar_time, yloc.abovebar, color.rgb(132, 0, 255), label.style_label_lower_right, size=size.small, textcolor = color.rgb(255, 255, 255), textalign = text.align_center)
+        label.new(t.currentTime, na, "SLP=" + formatPrice(predi), xloc.bar_time, yloc.abovebar, color.rgb(132, 0, 255), label.style_label_lower_left, size=size.small, textcolor = color.rgb(255, 255, 255), textalign = text.align_center)
         line.new(t.currentTime, t.currentPrice, timeAtOvershoot, slpPrice, xloc=xloc.bar_time, color=color.purple, style=line.style_arrow_right, width=1)
 
 // Draw the indicator on next confirmed tick
