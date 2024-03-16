@@ -6,6 +6,10 @@ Pine script for Trading View about an Hosoda N-Wave indicator
     THIS IS NOT AN ADVICE IN TRADING OR INVESTMENT. 
     USE, MODIFY, REDUCE, AUGMENT IT AT YOUR OWN RISK AND EXPENSE. 
 
+## Screenshot
+
+![alt text](https://github.com/Kirken2004/tv-kir-ondulat/blob/develop/preview.jpg?raw=true)
+
 ## Disclaimer
 
     Distributed under the GNU Lesser General Public License. 
@@ -86,7 +90,7 @@ I watched a presentation on Twitch about the undulatory theory of Hosoda. The st
 No. Probably not.
 
 
-## CONTACT
+## Contact
 
     None.
     
