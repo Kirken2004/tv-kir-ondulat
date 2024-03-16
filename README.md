@@ -70,6 +70,8 @@ Above that, arrows **N, V, E and NT** can still show potential targets.
 
 When the market is strongly bullish or bearish, it's not unusual to watch the price go crazy above or below the window. In such case, the chart may follow a strength arrow that is a multiple of **E** or **N**. That's why this script has an option to display those multiples. 
 
+The **SLP** stands for **Stupid Linear Prediction**. It's really just the direction the chart is heading into from the C point to now (now being the last confirmed bar). It has no real value but in your dreams. The calculated value shown in the purple label is the market price this chart would end up at if continuing in that direction, at the **Target Time**.
+
 
 ## F.A.Q.
 
