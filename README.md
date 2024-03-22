@@ -30,6 +30,10 @@ The actual code is very procedural and has many duplicated stuff.
 
 - Only tested on BTCUSDT. This script may fail to render correctly on symbols with many zeros after the decimal point, at their current value.
 
+- I used Bing Copilot to produce some parts of the script. 
+
+- Until now, Copilot never ever once produced a working pine script for v5. I had to cut and refactor for my needs. Copilot is at the moment a pain in the ***.
+
 
 ## Getting Started
 
@@ -47,17 +51,19 @@ The actual code is very procedural and has many duplicated stuff.
 
 ## Usage
 
+_I'm not the best to explain. The following may be inaccurate. I'm improvising briefly as those concepts comes to my mind writing this. Please, look for a proper documentation. Links at the bottom of this document._
+
 In theory, the **N Wave** is the usual conclusion of an ABC Wave, usually described as ABCD. But as D is not realised yet, while C is.
-If BC is atleast 33% of AB, it's fair to assume the price is going to rebound in the other direction with the same strength as the impulse AB. 
+If BC is atleast 33% of AB, it's fair to assume the price is going to turn in the other direction with the same strength as the impulse AB. 
 
 The **N arrow** is merely AB drawn again from C. 
-That hypothetical D pointed by the N arrow is at the **Target Time**.
+That hypothetical D pointed by the N arrow is at the **Target Time** (sometimes called the **N time**, or even **N Target**).
 
-The **Target Time** is in a window in which the value is not supposed to be drastically changing, once the current bar gets inside. The duration of the window is inferred by the BC duration. 
+The **Target Time** is in a window in which the value is not supposed to be drastically changing, once the current bar gets inside. The duration of the window is inferred by the BC duration. The right side of the window is usually predicting the end of a structure, and a period where a new one is building up.
 
-To make things safer, a dashed line named the **Decision Line**, away from BC, is drawn at the same distance from C. This dashed line is coercitive. You have to know that changing decision (your positions) once the chart is past that point, is unsafe if your position was assisted by this indicator. 
+A reddish dashed line named the **Decision Line** is drawn away from BC, at the same distance from C. This dashed line is at a moment in time when you may want to check the rightness of the predictions. If the candles follow the arrows and dont change direction before this stage, the window is still a potential target for the N Wave. If the candles went completly elsewhere, you probably misplaced your ABC points. Or the market just went crazy, like it often does (sic).
 
-The indicator is helpful at the time it is drawn until the chart gets in the window. It wont move over time. Whatever the market is doing, once on the other side of the **decision line**, this instance of the indicator becomes a thing of the past.
+The indicator is helpful at the time it is drawn until the candles gets into the window. It wont move over time. Whatever the market is doing, once on the other side of the **decision line**, this instance of the indicator becomes a thing of the past. If you made a plan using it, stick to the plan. And play it safe if the market tries something unexpected in that window. 
 
 The **E arrow** is what the market would have done if not stopped at B. But delayed by the BC time. 
 
@@ -66,11 +72,13 @@ The **NT arrow** is almost the opposite, it's what the market would have done at
 The **V arrow** is what the market would have done if the sign of BC had been reversed. 
 
 The indicator loses his relevance when the **Retracement BC** is lower than 33%.
-Above that, arrows **N, V, E and NT** can still show potential targets.
+Above that, arrows **N, V, E** and **NT** can still reveal potential targets.
 
-When the market is strongly bullish or bearish, it's not unusual to watch the price go crazy above or below the window. In such case, the chart may follow a strength arrow that is a multiple of **E** or **N**. That's why this script has an option to display those multiples. 
+When the market is strongly bullish or bearish, it's not unusual to watch the price go crazy above or below the window. In such cases, the chart may follow a strength arrow that is a multiple of **E** or **N**. That's why this script has an option to display those multiples as new attractive targets. 
 
-The **SLP** stands for **Stupid Linear Prediction**. It's really just the direction the chart is heading into from the C point to now (now being the last confirmed bar). It has no real value but in your dreams. The calculated value shown in the purple label is the market price this chart would end up at if continuing in that direction, at the **Target Time**.
+The **SLP** stands for **Stupid Linear Prediction**. It's really just the direction the chart is heading into from the C point to now (now being the last confirmed bar). It has no real value. The calculated value shown in the purple label is the market price this chart would end up at if continuing in that direction, up to the **Target Time**.
+
+At the moment, this indicator is tedious to use on several charts at once. You may require one layout(tab) per chart. Switching between symbols is not working. I wish i could draw several instances of this indicator on one chart. I'm pretty sure you'll find a comfy way to use it anyhow. 
 
 
 ## F.A.Q.
@@ -85,11 +93,37 @@ I did, and it lasted 24 hours, after which a moderator kicked me for breaching t
 
     What made you choose the N Wave as a subject for this exercise ?
 
-I watched a presentation on Twitch about the undulatory theory of Hosoda. The streamer used a private indicator, apparently very simple but behind a paywall or something. I found that weird as the indicator is so simple to reverse engineer. So i did. I may have stolen the color grading since i followed a screenshot of the stream. 
+I watched a presentation on Twitch about the undulatory theory of Hosoda. The streamer used a private indicator, apparently very simple but behind a paywall or something restricting. I found that weird as the indicator is so simple to reverse engineer. So i did. I may have stolen the color grading since i followed a screenshot of the stream. This streamer also had other options and more variant of the tool in his arsenal. I'm way out of my league and i'm not inclined to copycat everything he does. But that's inspiring. 
 
     Are you going to update this indicator in the future ? Or make new ones ?
 
-No. Probably not.
+No. Probably not. I'll get bored very quickly on that subject.
+
+
+## Documentation & Sources
+
+- Videos
+
+    - Japanese Forex Trader Kei's Masterclasses (English)
+
+        - Ichimoku Kinko Hyo Part 1 [https://www.youtube.com/watch?v=BsS6iAqDZFc]
+        - Ichimoku Kinko Hyo Part 2 [https://www.youtube.com/watch?v=paJ4siNG5DQ]
+        - Ichimoku Kinko Hyo Part 3 [https://www.youtube.com/watch?v=iKyue8rugmw]
+        - Ichimoku Kinko Hyo Part 4 [https://www.youtube.com/watch?v=4HJgaYwahyg]
+        - Ichimoku Kinko Hyo Part 5 [https://www.youtube.com/watch?v=fM4s_piN-Ps]
+
+    - ZS Trader's Masterclasses (French)
+
+        - On youtube [https://www.youtube.com/@cryptologik-live/videos]
+        - On twitch on tuesdays [https://www.twitch.tv/cryptologikfr]
+
+- Websites
+
+    - Wikipedia
+
+        - Fibonacci retracement [https://en.wikipedia.org/wiki/Fibonacci_retracement]
+        - Ichimoku Kinkō Hyō [https://en.wikipedia.org/wiki/Ichimoku_Kink%C5%8D_Hy%C5%8D]
+
 
 
 ## Contact

@@ -1,5 +1,19 @@
 VERSION HISTORY
 
+    v0.9.2 - 03-19-2024
+
+        - changed the SLP arrow to a realtime direction arrow ending up on TARGET TIME
+        - SLP arrow disappear past the TARGET TIME
+        - removed the VERSION.txt file that was only used internally
+        - Added a hint option for people in need of the Kihon Suchi cycles
+        - Added the built-in Ichimoku indicator as an integrated option
+        - Added the EMA line to the Ichimoku indicator
+        - Added Tenkan crossovers with Kijun counting the bars between crossings
+        - Limited the amount of labels drawn by the indicator
+        - Rewritten the fibonacci axis, opted for the B Point as a default placement
+        - The axis can be repositionned by offsetting it in bar units
+        - Revamped the arrow labels
+
     v0.9.1 - 03-16-2024
 
         - added a screenshot to the readme and the repo
