@@ -51,7 +51,7 @@ The actual code is very procedural and has many duplicated stuff.
 
 ## Usage
 
-_I'm not the best to explain. The following may be inaccurate. I'm improvising briefly as those concepts comes to my mind writing this. Please, look for a proper documentation. Links at the bottom of this document._
+_I'm not the best to explain. The following may be inaccurate. I'm improvising briefly as those concepts come to my mind writing this. Please, look for a proper documentation. Links at the bottom of this document._
 
 In theory, the **N Wave** is the usual conclusion of an ABC Wave, usually described as ABCD. But as D is not realised yet, while C is.
 If BC is atleast 33% of AB, it's fair to assume the price is going to turn in the other direction with the same strength as the impulse AB. 
