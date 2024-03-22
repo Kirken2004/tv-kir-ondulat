@@ -1,7 +1,7 @@
 //@version=5
 indicator("Kir Ondulatoire", shorttitle="KOndulat", overlay=true)
 
-    // version 0.9.1
+    // version 0.9.2
 
     // Copyright (C) 2024  Kir
 
@@ -19,8 +19,8 @@ indicator("Kir Ondulatoire", shorttitle="KOndulat", overlay=true)
     // with this program; if not, write to the Free Software Foundation, Inc.,
     // 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-int   TIME_DEFAULT  = 0
-float PRICE_DEFAULT = 0.0
+int       TIME_DEFAULT  = 0
+float     PRICE_DEFAULT = 0.0
 
 x1Input = input.time(TIME_DEFAULT,   "Point A", inline = "1", confirm = true)
 y1Input = input.price(PRICE_DEFAULT, "",        inline = "1", tooltip = "Pick point A", confirm = true)
@@ -29,9 +29,19 @@ y2Input = input.price(PRICE_DEFAULT, "",        inline = "2", tooltip = "Pick po
 x3Input = input.time(TIME_DEFAULT,   "Point C", inline = "3", confirm = true)
 y3Input = input.price(PRICE_DEFAULT, "",        inline = "3", tooltip = "Pick point C", confirm = true)
 
-mult = input.bool(defval=false, title="Multiples E/N", inline="option1", group="options")
-fibo = input.bool(defval=false, title="Fibonacci Axis", inline="option2", group="options")
-tend = input.bool(defval=false, title="Stupid Linear Dir", inline="option3", group="options")
+mult = input.bool(defval=false, title="Multiples E/N", inline="option1", group="Miscellaneous options")
+fibo = input.bool(defval=false, title="Fibonacci Axis", inline="option2", group="Miscellaneous options")
+tend = input.bool(defval=false, title="Stupid Linear Dir", inline="option3", group="Miscellaneous options")
+kisu = input.bool(defval=false, title="Kihon Sushi reminder", inline="option4", group="Miscellaneous options")
+ichi = input.bool(defval=false, title="Draw Ichimoku", inline="option5", group="Miscellaneous options")
+crss = input.bool(defval=false, title="Display Tenkan Crossover Cycles", inline="option6", group="Miscellaneous options")
+dema = input.bool(defval=false, title="Draw EMA", inline="options7", group="Miscellaneous options")
+
+int realtimeTime = 1
+float realtimePrice = 1.0
+int labelCount = 0
+
+var tab = table.new(position.bottom_center, 1, 1)
 
 type Wave
     int   time1
@@ -64,6 +74,56 @@ type Wave
     float boxNtPrice
     float currentPrice
     int   currentTime
+    int   barWidthInPixels
+
+// Fibonacci stuff
+fiboBarWidth = input.int(2, minval=-1000, maxval=1000, title="Fibo width in bars", group="Fibonacci Axis", tooltip = "Due to the lack of scale/zoom detection, the width of the graduations is expressed in a multiplier of bar width")
+fiboBarOffset = input.int(0, minval=-1000, maxval=1000, title="Offset to the right of the target window", group="Fibonacci Axis", tooltip="Due to the lack of scale/zoom detection, the axis is offseted from B Point by an amount of bar width")
+
+// Ichimoku stuff
+donchian(len) => math.avg(ta.lowest(len), ta.highest(len))
+conversionPeriods = input.int(9, minval=1, title="Conversion Line Length", group="Ichimoku")
+basePeriods = input.int(26, minval=1, title="Base Line Length", group="Ichimoku")
+laggingSpan2Periods = input.int(52, minval=1, title="Leading Span B Length", group="Ichimoku")
+displacement = input.int(26, minval=1, title="Lagging Span", group="Ichimoku")
+MaxLabels = input.int(5, minval=1, title="Maximum Crossover Labels", group="Ichimoku", tooltip = "An indicator is limited in the allowed amount of labels to draw. Keep this value low enough to prevent having lost labels.")
+conversionLine = donchian(conversionPeriods)
+baseLine = donchian(basePeriods)
+leadLine1 = math.avg(conversionLine, baseLine)
+leadLine2 = donchian(laggingSpan2Periods)
+
+// Tenkan crossovers with Kijun
+crossoverUp = ta.crossover(conversionLine, baseLine)
+crossoverDown = ta.crossunder(conversionLine, baseLine)
+
+// Initialize variables for keeping track of crossover bars and distance last one
+var int lastCrossBar = na
+var int crossDistance = na
+var int[] crossoverBars = array.new_int(0)
+var int[] crossoverDist = array.new_int(0)
+
+// Calculate distance in bars between crossovers
+if crossoverUp or crossoverDown
+    if not na(lastCrossBar)
+        crossDistance := bar_index - lastCrossBar
+        array.push(crossoverBars, bar_index)
+        array.push(crossoverDist, crossDistance)
+    lastCrossBar := bar_index
+
+// EMA
+len = input.int(200, minval=1, title="Length", group="Exponential Moving Average")
+src = input(close, title="Source", group="Exponential Moving Average")
+offset = input.int(title="Offset", defval=0, minval=-500, maxval=500, display = display.data_window, group="Exponential Moving Average")
+typeMA = input.string(title = "Method", defval = "SMA", options=["SMA", "EMA", "SMMA (RMA)", "WMA", "VWMA"], group="Exponential Moving Average", display = display.data_window)
+smoothingLength = input.int(title = "Length", defval = 5, minval = 1, maxval = 100, group="Exponential Moving Average", display = display.data_window)
+
+// ma(source, length, type) =>
+//     switch type
+//         "SMA" => ta.sma(source, length)
+//         "EMA" => ta.ema(source, length)
+//         "SMMA (RMA)" => ta.rma(source, length)
+//         "WMA" => ta.wma(source, length)
+//         "VWMA" => ta.vwma(source, length)
 
 _barForTime(_t) =>
     var int _bar = na
@@ -85,43 +145,43 @@ var labelRetracementBC = label.new(x=na, y=na, text="Retracement BC: na", color=
 var labelTargetTime = label.new(x=na, y=na, text="Test", color=color.rgb(0, 137, 123, 45), textcolor=color.rgb(255, 221, 117), style=label.style_label_up, xloc=xloc.bar_time, size=size.small)
 var labelBeforeTargetTime = label.new(x=na, y=na, text="Test", color=color.rgb(0, 137, 123, 48), textcolor=color.rgb(255, 255, 255, 34), style=label.style_label_down, xloc=xloc.bar_time, size=size.small)
 var labelAfterTargetTime = label.new(x=na, y=na, text="Test", color=color.rgb(0, 137, 123, 48), textcolor=color.rgb(255, 255, 255, 34), style=label.style_label_down, xloc=xloc.bar_time, size=size.small)
-var labelTargetPriceE = label.new(x=na, y=na, text="E= na", color=color.gray, textcolor=color.blue, style=label.style_none, xloc=xloc.bar_time)
-var labelTargetPriceN = label.new(x=na, y=na, text="N= na", color=color.gray, textcolor=color.orange, style=label.style_none, xloc=xloc.bar_time)
-var labelTargetPriceV = label.new(x=na, y=na, text="V= na", color=color.gray, textcolor=color.rgb(255, 82, 102), style=label.style_none, xloc=xloc.bar_time)
-var labelTargetPriceNt = label.new(x=na, y=na, text="NT= na", color=color.gray, textcolor=color.green, style=label.style_none, xloc=xloc.bar_time)
+var labelTargetPriceE = label.new(x=na, y=na, text="E= na", color=color.rgb(120, 123, 134, 90), textcolor=color.blue, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPriceN = label.new(x=na, y=na, text="N= na", color=color.rgb(120, 123, 134, 90), textcolor=color.orange, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPriceV = label.new(x=na, y=na, text="V= na", color=color.rgb(120, 123, 134, 90), textcolor=color.rgb(255, 82, 102), style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPriceNt = label.new(x=na, y=na, text="NT= na", color=color.rgb(120, 123, 134, 90), textcolor=color.green, style=label.style_label_left, xloc=xloc.bar_time)
 
-var labelTargetPrice2E = label.new(x=na, y=na, text="2E: na", color=color.gray, textcolor=color.blue, style=label.style_none, xloc=xloc.bar_time)
-var labelTargetPrice2N = label.new(x=na, y=na, text="2N: na", color=color.gray, textcolor=color.orange, style=label.style_none, xloc=xloc.bar_time)
-var labelTargetPrice3E = label.new(x=na, y=na, text="3E: na", color=color.gray, textcolor=color.blue, style=label.style_none, xloc=xloc.bar_time)
-var labelTargetPrice3N = label.new(x=na, y=na, text="3N: na", color=color.gray, textcolor=color.orange, style=label.style_none, xloc=xloc.bar_time)
-var labelTargetPrice4E = label.new(x=na, y=na, text="4E: na", color=color.gray, textcolor=color.blue, style=label.style_none, xloc=xloc.bar_time)
-var labelTargetPrice4N = label.new(x=na, y=na, text="4N: na", color=color.gray, textcolor=color.orange, style=label.style_none, xloc=xloc.bar_time)
-var labelTargetPrice5E = label.new(x=na, y=na, text="4E: na", color=color.gray, textcolor=color.blue, style=label.style_none, xloc=xloc.bar_time)
-var labelTargetPrice5N = label.new(x=na, y=na, text="4N: na", color=color.gray, textcolor=color.orange, style=label.style_none, xloc=xloc.bar_time)
+var labelTargetPrice2E = label.new(x=na, y=na, text="2E: na", color=color.rgb(120, 123, 134, 90), textcolor=color.blue, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPrice2N = label.new(x=na, y=na, text="2N: na", color=color.rgb(120, 123, 134, 90), textcolor=color.orange, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPrice3E = label.new(x=na, y=na, text="3E: na", color=color.rgb(120, 123, 134, 90), textcolor=color.blue, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPrice3N = label.new(x=na, y=na, text="3N: na", color=color.rgb(120, 123, 134, 90), textcolor=color.orange, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPrice4E = label.new(x=na, y=na, text="4E: na", color=color.rgb(120, 123, 134, 90), textcolor=color.blue, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPrice4N = label.new(x=na, y=na, text="4N: na", color=color.rgb(120, 123, 134, 90), textcolor=color.orange, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPrice5E = label.new(x=na, y=na, text="4E: na", color=color.rgb(120, 123, 134, 90), textcolor=color.blue, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPrice5N = label.new(x=na, y=na, text="4N: na", color=color.rgb(120, 123, 134, 90), textcolor=color.orange, style=label.style_label_left, xloc=xloc.bar_time)
 
 var labelFiboTextColor = color.teal
 var labelFiboTextColorNeg = color.rgb(0, 104, 93)
 var labelFiboTextColorNegCrash = color.red
 var labelFiboTextColorGoal = color.rgb(165, 209, 204)
 var labelFiboTextColorGold = color.rgb(255, 224, 71)
-var labelFibo0 = label.new(x=na, y=na, text="    0 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_center, xloc=xloc.bar_time)
-var labelFibo23 = label.new(x=na, y=na, text="23.6 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_center, xloc=xloc.bar_time)
-var labelFibo38 = label.new(x=na, y=na, text="38.2 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_center, xloc=xloc.bar_time)
-var labelFibo50 = label.new(x=na, y=na, text="50.0 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_center, xloc=xloc.bar_time)
-var labelFibo61 = label.new(x=na, y=na, text="61.8 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_center, xloc=xloc.bar_time)
-var labelFibo78 = label.new(x=na, y=na, text="78.8 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_center, xloc=xloc.bar_time)
-var labelFibo100 = label.new(x=na, y=na, text=" 100 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGoal, style=label.style_label_center, xloc=xloc.bar_time)
-var labelFibo123 = label.new(x=na, y=na, text=" 123 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGoal, style=label.style_label_center, xloc=xloc.bar_time)
-var labelFibo138 = label.new(x=na, y=na, text=" 138 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGoal, style=label.style_label_center, xloc=xloc.bar_time)
-var labelFibo161 = label.new(x=na, y=na, text=" 161 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGold, style=label.style_label_center, xloc=xloc.bar_time)
+var labelFibo0 = label.new(x=na, y=na, text="    0 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo23 = label.new(x=na, y=na, text="23.6 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo38 = label.new(x=na, y=na, text="38.2 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo50 = label.new(x=na, y=na, text="50.0 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo61 = label.new(x=na, y=na, text="61.8 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo78 = label.new(x=na, y=na, text="78.8 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo100 = label.new(x=na, y=na, text=" 100 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGoal, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo123 = label.new(x=na, y=na, text=" 123 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGoal, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo138 = label.new(x=na, y=na, text=" 138 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGoal, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo161 = label.new(x=na, y=na, text=" 161 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGold, style=label.style_label_left, xloc=xloc.bar_time)
 
-var labelFiboN0 = label.new(x=na, y=na, text="-0 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_center, xloc=xloc.bar_time)
-var labelFiboN23 = label.new(x=na, y=na, text="-23.6 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_center, xloc=xloc.bar_time)
-var labelFiboN38 = label.new(x=na, y=na, text="-38.2 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_center, xloc=xloc.bar_time)
-var labelFiboN50 = label.new(x=na, y=na, text="-50.0 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_center, xloc=xloc.bar_time)
-var labelFiboN61 = label.new(x=na, y=na, text="-61.8 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_center, xloc=xloc.bar_time)
-var labelFiboN78 = label.new(x=na, y=na, text="-78.8 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_center, xloc=xloc.bar_time)
-var labelFiboN100 = label.new(x=na, y=na, text=" -100 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNegCrash, style=label.style_label_center, xloc=xloc.bar_time)
+var labelFiboN0 = label.new(x=na, y=na, text="-0 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
+var labelFiboN23 = label.new(x=na, y=na, text="-23.6 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
+var labelFiboN38 = label.new(x=na, y=na, text="-38.2 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
+var labelFiboN50 = label.new(x=na, y=na, text="-50.0 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
+var labelFiboN61 = label.new(x=na, y=na, text="-61.8 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
+var labelFiboN78 = label.new(x=na, y=na, text="-78.8 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
+var labelFiboN100 = label.new(x=na, y=na, text=" -100 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNegCrash, style=label.style_label_right, xloc=xloc.bar_time)
 
 // Main Drawing function using Wave theory about N Waves with Undulatory by Hosoda
 drawIndicator(Wave t) =>
@@ -182,6 +242,8 @@ drawIndicator(Wave t) =>
     // Compute tenth (deciles) of the box duration
     priceDeci = (t.price4 - t.price3) / 10
     timeDeci = (t.boxTime1 - t.boxTime0) / 10
+    int labelTextWidth = str.length(labelTargetPriceNt.get_text()) * 6 / 10
+    //log.info(str.format("{0, number, ###.###}", labelTextWidth))
 
     // Retracement of C over B
     retracementBC = 100 * math.abs(t.price3 - t.price2) / math.abs(t.price2 - t.price1)
@@ -214,143 +276,141 @@ drawIndicator(Wave t) =>
     labelAfterTargetTime.set_text(str.format_time(t.boxTime1, 'dd-MMM-yyyy\nHH:mm:ss', "UTC+2"))
 
     // Arrow Labels
-    labelTargetPriceE.set_x(t.boxTime1 + 2 * timeDeci)
+    labelTargetPriceE.set_x(t.boxTime1)
     labelTargetPriceE.set_y(t.boxTopPrice)
     labelTargetPriceE.set_yloc(yloc.price)
     labelTargetPriceE.set_text("E=" + str.format("{0, number, #.##}", t.boxTopPrice))
 
-    labelTargetPriceN.set_x(t.boxTime1 + 2 * timeDeci)
+    labelTargetPriceN.set_x(t.boxTime1)
     labelTargetPriceN.set_y(t.price4)
     labelTargetPriceN.set_yloc(yloc.price)
     labelTargetPriceN.set_text("N=" + str.format("{0, number, #.##}", t.price4))
 
-    labelTargetPriceV.set_x(t.boxTime1 + 2 * timeDeci)
+    labelTargetPriceV.set_x(t.boxTime1)
     labelTargetPriceV.set_y(t.boxVPrice)
     labelTargetPriceV.set_yloc(yloc.price)
     labelTargetPriceV.set_text("V=" + str.format("{0, number, #.##}", t.boxVPrice))
 
-    labelTargetPriceNt.set_x(t.boxTime1 + 2 * timeDeci)
+    labelTargetPriceNt.set_x(t.boxTime1)
     labelTargetPriceNt.set_y(t.boxNtPrice)
     labelTargetPriceNt.set_yloc(yloc.price)
     labelTargetPriceNt.set_text("NT=" + str.format("{0, number, #.##}", t.boxNtPrice))
-
+        
     if mult
-        labelTargetPrice2E.set_x(t.boxTime1 + 2 * timeDeci)
+        labelTargetPrice2E.set_x(t.boxTime1)
         labelTargetPrice2E.set_y(t.boxTopPrice2)
         labelTargetPrice2E.set_yloc(yloc.price)
         labelTargetPrice2E.set_text("2E=" + str.format("{0, number, #.##}", t.boxTopPrice2))
 
-        labelTargetPrice2N.set_x(t.boxTime1 + 2 * timeDeci)
+        labelTargetPrice2N.set_x(t.boxTime1)
         labelTargetPrice2N.set_y(t.boxTopPrice2 - (t.boxTopPrice - t.price4))
         labelTargetPrice2N.set_yloc(yloc.price)
         labelTargetPrice2N.set_text("2N=" + str.format("{0, number, #.##}", t.boxTopPrice2 - (t.boxTopPrice - t.price4)))
 
-        labelTargetPrice3E.set_x(t.boxTime1 + 2 * timeDeci)
+        labelTargetPrice3E.set_x(t.boxTime1)
         labelTargetPrice3E.set_y(t.boxTopPrice3)
         labelTargetPrice3E.set_yloc(yloc.price)
         labelTargetPrice3E.set_text("3E=" + str.format("{0, number, #.##}", t.boxTopPrice3))
 
-        labelTargetPrice3N.set_x(t.boxTime1 + 2 * timeDeci)
+        labelTargetPrice3N.set_x(t.boxTime1)
         labelTargetPrice3N.set_y(t.boxTopPrice3 - (t.boxTopPrice - t.price4))
         labelTargetPrice3N.set_yloc(yloc.price)
         labelTargetPrice3N.set_text("3N=" + str.format("{0, number, #.##}", t.boxTopPrice3 - (t.boxTopPrice - t.price4)))
 
-        labelTargetPrice4E.set_x(t.boxTime1 + 2 * timeDeci)
+        labelTargetPrice4E.set_x(t.boxTime1)
         labelTargetPrice4E.set_y(t.boxTopPrice4)
         labelTargetPrice4E.set_yloc(yloc.price)
         labelTargetPrice4E.set_text("4E=" + str.format("{0, number, #.##}", t.boxTopPrice4))
 
-        labelTargetPrice4N.set_x(t.boxTime1 + 2 * timeDeci)
+        labelTargetPrice4N.set_x(t.boxTime1)
         labelTargetPrice4N.set_y(t.boxTopPrice4 - (t.boxTopPrice - t.price4))
         labelTargetPrice4N.set_yloc(yloc.price)
         labelTargetPrice4N.set_text("4N=" + str.format("{0, number, #.##}", t.boxTopPrice4 - (t.boxTopPrice - t.price4)))
         
-        labelTargetPrice5E.set_x(t.boxTime1 + 2 * timeDeci)
+        labelTargetPrice5E.set_x(t.boxTime1)
         labelTargetPrice5E.set_y(t.boxTopPrice5)
         labelTargetPrice5E.set_yloc(yloc.price)
         labelTargetPrice5E.set_text("5E=" + str.format("{0, number, #.##}", t.boxTopPrice5))
 
-        labelTargetPrice5N.set_x(t.boxTime1 + 2 * timeDeci)
+        labelTargetPrice5N.set_x(t.boxTime1)
         labelTargetPrice5N.set_y(t.boxTopPrice5 - (t.boxTopPrice - t.price4))
         labelTargetPrice5N.set_yloc(yloc.price)
         labelTargetPrice5N.set_text("5N=" + str.format("{0, number, #.##}", t.boxTopPrice5 - (t.boxTopPrice - t.price4)))
 
     if fibo
-        var offsetXFiboM = t.boxTime1 + 10 * timeDeci
-        var offsetXFiboL = offsetXFiboM - (nb_seconds * 1000)
-        var offsetXFiboR = offsetXFiboM + (nb_seconds * 1000)
-        var offsetXLabelsFibo = offsetXFiboR - offsetXFiboL + nb_seconds * 1000 * 4
+        var offsetXFiboM = (nb_seconds * 1000 * fiboBarOffset) + t.time2
+        var offsetXFiboL = offsetXFiboM - (nb_seconds * 1000 * fiboBarWidth)
+        var offsetXFiboR = offsetXFiboM + (nb_seconds * 1000 * fiboBarWidth)
         var fiboScaleColor = color.rgb(31, 205, 187)
         var fiboAxisColor = color.rgb(92, 234, 220)
         var fiboZeroColor = color.rgb(31, 205, 187, 42)
 
         line.new(t.time3, t.price3, offsetXFiboR, t.price3, xloc = xloc.bar_time, color = fiboZeroColor, width=1, style=line.style_dotted)    // 0%
-        labelFibo0.set_x(offsetXFiboR + offsetXLabelsFibo), labelFibo0.set_y(t.price3)
-
+        labelFibo0.set_x(offsetXFiboR), labelFibo0.set_y(t.price3)
 
         var fibo23 = 23.6 * ((t.price4 - t.price3) / 100) + t.price3
         line.new(offsetXFiboM, fibo23, offsetXFiboR, fibo23, xloc = xloc.bar_time, color = fiboScaleColor, width=1, style=line.style_solid)    // 23.6%
-        labelFibo23.set_x(offsetXFiboR + offsetXLabelsFibo), labelFibo23.set_y(fibo23)
+        labelFibo23.set_x(offsetXFiboR), labelFibo23.set_y(fibo23)
 
         var fibo38 = 38.2 * ((t.price4 - t.price3) / 100) + t.price3
         line.new(offsetXFiboM, fibo38, offsetXFiboR, fibo38, xloc = xloc.bar_time, color = fiboScaleColor, width=1, style=line.style_solid)    // 38.2%
-        labelFibo38.set_x(offsetXFiboR + offsetXLabelsFibo), labelFibo38.set_y(fibo38)
+        labelFibo38.set_x(offsetXFiboR), labelFibo38.set_y(fibo38)
 
         var fibo50 = 50.0 * ((t.price4 - t.price3) / 100) + t.price3
         line.new(offsetXFiboM, fibo50, offsetXFiboR, fibo50, xloc = xloc.bar_time, color = fiboScaleColor, width=1, style=line.style_solid)    // 50.0%
-        labelFibo50.set_x(offsetXFiboR + offsetXLabelsFibo), labelFibo50.set_y(fibo50)
+        labelFibo50.set_x(offsetXFiboR), labelFibo50.set_y(fibo50)
 
         var fibo61 = 61.8 * ((t.price4 - t.price3) / 100) + t.price3
         line.new(offsetXFiboM, fibo61, offsetXFiboR, fibo61, xloc = xloc.bar_time, color = fiboScaleColor, width=1, style=line.style_solid)    // 61.8%
-        labelFibo61.set_x(offsetXFiboR + offsetXLabelsFibo), labelFibo61.set_y(fibo61)
+        labelFibo61.set_x(offsetXFiboR), labelFibo61.set_y(fibo61)
 
         var fibo78 = 78.6 * ((t.price4 - t.price3) / 100) + t.price3
         line.new(offsetXFiboM, fibo78, offsetXFiboR, fibo78, xloc = xloc.bar_time, color = fiboScaleColor, width=1, style=line.style_solid)    // 78.6%
-        labelFibo78.set_x(offsetXFiboR + offsetXLabelsFibo), labelFibo78.set_y(fibo78)
+        labelFibo78.set_x(offsetXFiboR), labelFibo78.set_y(fibo78)
 
         line.new(offsetXFiboM, t.price4, offsetXFiboR, t.price4, xloc = xloc.bar_time, color = fiboScaleColor, width=1, style=line.style_solid)    // 100%
-        labelFibo100.set_x(offsetXFiboR + offsetXLabelsFibo), labelFibo100.set_y(t.price4)
+        labelFibo100.set_x(offsetXFiboR), labelFibo100.set_y(t.price4)
 
         var fibo123 = 123.6 * ((t.price4 - t.price3) / 100) + t.price3
         line.new(offsetXFiboM, fibo123, offsetXFiboR, fibo123, xloc = xloc.bar_time, color = fiboScaleColor, width=1, style=line.style_solid)    // 123%
-        labelFibo123.set_x(offsetXFiboR + offsetXLabelsFibo), labelFibo123.set_y(fibo123)
+        labelFibo123.set_x(offsetXFiboR), labelFibo123.set_y(fibo123)
 
         var fibo138 = 138.2 * ((t.price4 - t.price3) / 100) + t.price3
         line.new(offsetXFiboM, fibo138, offsetXFiboR, fibo138, xloc = xloc.bar_time, color = fiboScaleColor, width=1, style=line.style_solid)    // 138%
-        labelFibo138.set_x(offsetXFiboR + offsetXLabelsFibo), labelFibo138.set_y(fibo138)
+        labelFibo138.set_x(offsetXFiboR), labelFibo138.set_y(fibo138)
 
         var fibo161 = 161.8 * ((t.price4 - t.price3) / 100) + t.price3
         line.new(offsetXFiboM, fibo161, offsetXFiboR, fibo161, xloc = xloc.bar_time, color = labelFiboTextColorGold, width=1, style=line.style_solid)    // 161%
-        labelFibo161.set_x(offsetXFiboR + offsetXLabelsFibo), labelFibo161.set_y(fibo161)
+        labelFibo161.set_x(offsetXFiboR), labelFibo161.set_y(fibo161)
 
         line.new(offsetXFiboL, t.price2, offsetXFiboM, t.price2, xloc = xloc.bar_time, color = labelFiboTextColorNeg, width=1, style=line.style_solid)    // 0% at B
-        labelFiboN0.set_x(offsetXFiboR - offsetXLabelsFibo), labelFiboN0.set_y(t.price2)    
+        labelFiboN0.set_x(offsetXFiboL), labelFiboN0.set_y(t.price2)    
 
         var fiboN23 = -23.6 * ((t.price2 - t.price1) / 100) + t.price2
         line.new(offsetXFiboL, fiboN23, offsetXFiboM, fiboN23, xloc = xloc.bar_time, color = labelFiboTextColorNeg, width=1, style=line.style_solid)    // -23.6%
-        labelFiboN23.set_x(offsetXFiboR - offsetXLabelsFibo), labelFiboN23.set_y(fiboN23)
+        labelFiboN23.set_x(offsetXFiboL), labelFiboN23.set_y(fiboN23)
 
         var fiboN38 = -38.2 * ((t.price2 - t.price1) / 100) + t.price2
         line.new(offsetXFiboL, fiboN38, offsetXFiboM, fiboN38, xloc = xloc.bar_time, color = labelFiboTextColorNeg, width=1, style=line.style_solid)    // -38.2%
-        labelFiboN38.set_x(offsetXFiboR - offsetXLabelsFibo), labelFiboN38.set_y(fiboN38)
+        labelFiboN38.set_x(offsetXFiboL), labelFiboN38.set_y(fiboN38)
 
         var fiboN50 = -50.0 * ((t.price2 - t.price1) / 100) + t.price2
         line.new(offsetXFiboL, fiboN50, offsetXFiboM, fiboN50, xloc = xloc.bar_time, color = labelFiboTextColorNeg, width=1, style=line.style_solid)    // -50.0%
-        labelFiboN50.set_x(offsetXFiboR - offsetXLabelsFibo), labelFiboN50.set_y(fiboN50)
+        labelFiboN50.set_x(offsetXFiboL), labelFiboN50.set_y(fiboN50)
 
         var fiboN61 = -61.8 * ((t.price2 - t.price1) / 100) + t.price2
         line.new(offsetXFiboL, fiboN61, offsetXFiboM, fiboN61, xloc = xloc.bar_time, color = labelFiboTextColorNeg, width=1, style=line.style_solid)    // -61.8%
-        labelFiboN61.set_x(offsetXFiboR - offsetXLabelsFibo), labelFiboN61.set_y(fiboN61)
+        labelFiboN61.set_x(offsetXFiboL), labelFiboN61.set_y(fiboN61)
 
         var fiboN78 = -78.6 * ((t.price2 - t.price1) / 100) + t.price2
         line.new(offsetXFiboL, fiboN78, offsetXFiboM, fiboN78, xloc = xloc.bar_time, color = labelFiboTextColorNeg, width=1, style=line.style_solid)    // -78.6%
-        labelFiboN78.set_x(offsetXFiboR - offsetXLabelsFibo), labelFiboN78.set_y(fiboN78)
+        labelFiboN78.set_x(offsetXFiboL), labelFiboN78.set_y(fiboN78)
 
         line.new(offsetXFiboL, t.price1, offsetXFiboM, t.price1, xloc = xloc.bar_time, color = labelFiboTextColorNegCrash, width=1, style=line.style_solid)    // -100%
-        labelFiboN100.set_x(offsetXFiboR - offsetXLabelsFibo), labelFiboN100.set_y(t.price1)
+        labelFiboN100.set_x(offsetXFiboL), labelFiboN100.set_y(t.price1)
 
         line.new(offsetXFiboM, t.price1, offsetXFiboM, fibo161, xloc = xloc.bar_time, color = fiboAxisColor, width=1, style=line.style_solid)   // vertical scale axis
-
+        
 formatPrice(float predi) =>
     var result = str.format("{0, number, ###}", predi)
     if predi > 1000
@@ -360,14 +420,27 @@ formatPrice(float predi) =>
 drawSLP(Wave t) =>
 
     // Stupid Linear Prediction
-    if tend
+    if tend and t.time4 > t.currentTime
         var nBarOvershoot = 5
         var predi = t.price3 + ((t.currentPrice - t.price3)*(t.time4 - t.time3))/(t.currentTime - t.time3)
-        var timeAtOvershoot = t.currentTime + (nBarOvershoot * nb_seconds * 1000)
+        var timeAtOvershoot = t.time4 //t.currentTime + (nBarOvershoot * nb_seconds * 1000)
         var slpPrice = t.price3 + ((t.currentPrice - t.price3)*(timeAtOvershoot - t.time3))/(t.currentTime - t.time3)
 
         label.new(t.currentTime, na, "SLP=" + formatPrice(predi), xloc.bar_time, yloc.abovebar, color.rgb(132, 0, 255), label.style_label_lower_left, size=size.small, textcolor = color.rgb(255, 255, 255), textalign = text.align_center)
         line.new(t.currentTime, t.currentPrice, timeAtOvershoot, slpPrice, xloc=xloc.bar_time, color=color.purple, style=line.style_arrow_right, width=1)
+
+if barstate.isrealtime and not barstate.isconfirmed
+
+    Wave wave = Wave.new()
+
+    wave.time3  := x3Input
+    wave.price3 := y3Input
+    wave.time4  := x3Input + (x2Input - x1Input)
+
+    wave.currentPrice := close //barstate.islastconfirmedhistory ? close : 1
+    wave.currentTime := time //barstate.islastconfirmedhistory ? time : wave.time3
+    
+    drawSLP(wave)
 
 // Draw the indicator on next confirmed tick
 if barstate.islastconfirmedhistory
@@ -402,8 +475,36 @@ if barstate.islastconfirmedhistory
     wave.boxTopPrice3 := 3 * (wave.boxTopPrice - wave.price3) + wave.price3
     wave.boxTopPrice4 := 4 * (wave.boxTopPrice - wave.price3) + wave.price3
     wave.boxTopPrice5 := 5 * (wave.boxTopPrice - wave.price3) + wave.price3
+    wave.barWidthInPixels := math.abs(bar_index - bar_index[1])
 
-    wave.currentPrice := barstate.islastconfirmedhistory ? high : 1
-    wave.currentTime := barstate.islastconfirmedhistory ? time : wave.time3
-    drawSLP(wave)
     drawIndicator(wave)
+
+if barstate.islast
+    
+    if kisu
+        table.cell(tab, 0, 0, "Kihon Suchi 9, 17, 26, 33, 42, 51, 65, 76,,,", 17, 3, text_color = color.yellow, text_size = size.small, bgcolor = color.rgb(61, 61, 61))
+
+// Ichimoku stuff
+plot(ichi ? conversionLine : na, color=#4385ff, title="Tekan Conversion Line")                                        // TENKAN SEN
+plot(ichi ? baseLine : na, color=#f83737, title="Kijun Base Line")                                                    // KIJUN SEN
+plot(ichi ? close : na, offset = -displacement + 1, color=#43A047, title="Lagging Span")
+p1 = plot(ichi ? leadLine1 : na, offset = displacement - 1, color=#A5D6A7, title="Leading Span A")
+p2 = plot(ichi ? leadLine2 : na, offset = displacement - 1, color=#EF9A9A, title="Leading Span B")
+//plot(ichi ? (leadLine1 > leadLine2 ? leadLine1 : leadLine2) : na, offset = displacement - 1, title = "Kumo Cloud Upper Line", color = #7eff83, display = display.none)
+//plot(ichi ? (leadLine1 < leadLine2 ? leadLine1 : leadLine2) : na, offset = displacement - 1, title = "Kumo Cloud Lower Line", color = #ff6464, display = display.none)
+fill(p1, p2, color = leadLine1 > leadLine2 ? color.rgb(67, 160, 71, 90) : color.rgb(244, 67, 54, 90))
+
+// Display of the Tenkan Crossover Gaps
+if crss and barstate.islastconfirmedhistory
+
+    // Print the list of crossover bars and distances
+    for i = array.size(crossoverBars) - 1 to 0
+        int v = array.get(crossoverBars, i)
+        int d = array.get(crossoverDist, i)
+        labelCount := labelCount + 1
+        if labelCount <= 5
+            label.new(v, na, "⬅ " + str.format("{0, number, ###}", d), xloc.bar_index, yloc.abovebar, color.rgb(255, 0, 0), label.style_arrowdown, color.rgb(117, 188, 255), size.normal)
+
+// EMA
+out = ta.ema(src, len)
+plot(dema ? out : na, title="EMA Line", color=color.rgb(240, 243, 33), offset=offset, linewidth = 1)
