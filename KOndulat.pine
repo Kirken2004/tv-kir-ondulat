@@ -409,7 +409,9 @@ drawIndicator(Wave t) =>
         line.new(offsetXFiboL, t.price1, offsetXFiboM, t.price1, xloc = xloc.bar_time, color = labelFiboTextColorNegCrash, width=1, style=line.style_solid)    // -100%
         labelFiboN100.set_x(offsetXFiboL), labelFiboN100.set_y(t.price1)
 
-        line.new(offsetXFiboM, t.price1, offsetXFiboM, fibo161, xloc = xloc.bar_time, color = fiboAxisColor, width=1, style=line.style_solid)   // vertical scale axis
+        var topAxis = math.max(t.price1, t.price2, fibo161, t.price3)
+        var botAxis = math.min(t.price1, t.price2, fibo161, t.price3)
+        line.new(offsetXFiboM, botAxis, offsetXFiboM, topAxis, xloc = xloc.bar_time, color = fiboAxisColor, width=1, style=line.style_solid)   // vertical scale axis
         
 formatPrice(float predi) =>
     var result = str.format("{0, number, ###}", predi)

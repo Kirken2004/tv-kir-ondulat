@@ -6,9 +6,22 @@ Pine script for Trading View about an Hosoda N-Wave indicator
     THIS IS NOT AN ADVICE IN TRADING OR INVESTMENT. 
     USE, MODIFY, REDUCE, AUGMENT IT AT YOUR OWN RISK AND EXPENSE. 
 
-## Screenshot
 
-![alt text](https://github.com/Kirken2004/tv-kir-ondulat/blob/develop/preview.jpg?raw=true)
+## Screenshots
+
+![N Wave Target Window](https://github.com/Kirken2004/tv-kir-ondulat/blob/develop/preview.jpg?raw=true)
+<p align="center">fig. 1 - The N Wave Target Window</p>
+![Fibonacci Axis](https://github.com/Kirken2004/tv-kir-ondulat/blob/develop/preview_fibonacci_axis_retracements.jpg?raw=true)
+<p align="center">fig. 2 - The Fibonacci Axis and the Retracements</p>
+![Ichimoku Kynko Hyo and EMA](https://github.com/Kirken2004/tv-kir-ondulat/blob/develop/preview_ichimoku_ema.jpg?raw=true)
+<p align="center">fig. 3 - Ichimoku Kynko Hyo, Clouds and the EMA 200</p>
+![Kihon Sushi Tenkan](https://github.com/Kirken2004/tv-kir-ondulat/blob/develop/preview_kihon_sushi_tenkan_crossovers.jpg?raw=true)
+<p align="center">fig. 4 - Kihon Sushi and Tenkan Crossover Cycles</p>
+![Inputs Panel](https://github.com/Kirken2004/tv-kir-ondulat/blob/develop/preview_settings_inputs.jpg?raw=true)
+<p align="center">fig. 5 - The Settings - The Inputs Panel</p>
+![Styles Panel](https://github.com/Kirken2004/tv-kir-ondulat/blob/develop/preview_settings_styles.jpg?raw=true)
+<p align="center">fig. 6 - The Settings - The Styles Panel</p>
+
 
 ## Disclaimer
 
@@ -51,7 +64,7 @@ The actual code is very procedural and has many duplicated stuff.
 
 ## Usage
 
-_I'm not the best to explain. The following may be inaccurate. I'm improvising briefly as those concepts comes to my mind writing this. Please, look for a proper documentation. Links at the bottom of this document._
+_I'm not the best to explain. The following may be inaccurate. I'm improvising briefly as those concepts come to my mind writing this. Please, look for a proper documentation. Links at the bottom of this document._
 
 In theory, the **N Wave** is the usual conclusion of an ABC Wave, usually described as ABCD. But as D is not realised yet, while C is.
 If BC is atleast 33% of AB, it's fair to assume the price is going to turn in the other direction with the same strength as the impulse AB. 
