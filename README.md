@@ -15,8 +15,8 @@ Pine script for Trading View about an Hosoda N-Wave indicator
 ![Fibonacci Axis](https://github.com/Kirken2004/tv-kir-ondulat/blob/main/preview_fibonacci_axis_retracements.jpg?raw=true)
 <p align="center">fig. 2 - The Fibonacci Axis and the Retracements</p>
 
-![Ichimoku Kynko Hyo and EMA](https://github.com/Kirken2004/tv-kir-ondulat/blob/main/preview_ichimoku_ema.jpg?raw=true)
-<p align="center">fig. 3 - Ichimoku Kynko Hyo, Clouds and the EMA 200</p>
+![Ichimoku Kinko Hyo and EMA](https://github.com/Kirken2004/tv-kir-ondulat/blob/main/preview_ichimoku_ema.jpg?raw=true)
+<p align="center">fig. 3 - Ichimoku Kinko Hyo, Clouds and the EMA 200</p>
 
 ![Kihon Suchi and Tenkan Crossover Cycles](https://github.com/Kirken2004/tv-kir-ondulat/blob/main/preview_kihon_suchi_tenkan_crossovers.jpg?raw=true)
 <p align="center">fig. 4 - Kihon Suchi and Tenkan Crossover Cycles</p>
