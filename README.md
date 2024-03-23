@@ -18,14 +18,14 @@ Pine script for Trading View about an Hosoda N-Wave indicator
 ![Ichimoku Kynko Hyo and EMA](https://github.com/Kirken2004/tv-kir-ondulat/blob/main/preview_ichimoku_ema.jpg?raw=true)
 <p align="center">fig. 3 - Ichimoku Kynko Hyo, Clouds and the EMA 200</p>
 
-![Kihon Sushi Tenkan](https://github.com/Kirken2004/tv-kir-ondulat/blob/main/preview_kihon_sushi_tenkan_crossovers.jpg?raw=true)
-<p align="center">fig. 4 - Kihon Sushi and Tenkan Crossover Cycles</p>
+![Kihon Suchi and Tenkan Crossover Cycles](https://github.com/Kirken2004/tv-kir-ondulat/blob/main/preview_kihon_suchi_tenkan_crossovers.jpg?raw=true)
+<p align="center">fig. 4 - Kihon Suchi and Tenkan Crossover Cycles</p>
 
 ![Inputs Panel](https://github.com/Kirken2004/tv-kir-ondulat/blob/main/preview_settings_inputs.jpg?raw=true)
 <p align="center">fig. 5 - The Settings - The Inputs Panel</p>
 
-![Styles Panel](https://github.com/Kirken2004/tv-kir-ondulat/blob/main/preview_settings_styles.jpg?raw=true)
-<p align="center">fig. 6 - The Settings - The Styles Panel</p>
+![Style Panel](https://github.com/Kirken2004/tv-kir-ondulat/blob/main/preview_settings_style.jpg?raw=true)
+<p align="center">fig. 6 - The Settings - The Style Panel</p>
 
 
 

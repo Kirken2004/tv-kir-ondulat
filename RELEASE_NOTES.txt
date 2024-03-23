@@ -1,5 +1,9 @@
 VERSION HISTORY
 
+    v0.9.3 - 03-23-2024
+
+        - fixes and typos
+
     v0.9.2 - 03-19-2024
 
         - changed the SLP arrow to a realtime direction arrow ending up on TARGET TIME
