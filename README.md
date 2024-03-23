@@ -9,18 +9,24 @@ Pine script for Trading View about an Hosoda N-Wave indicator
 
 ## Screenshots
 
-![N Wave Target Window](https://github.com/Kirken2004/tv-kir-ondulat/blob/develop/preview.jpg?raw=true)
+![N Wave Target Window](https://github.com/Kirken2004/tv-kir-ondulat/blob/main/preview.jpg?raw=true)
 <p align="center">fig. 1 - The N Wave Target Window</p>
-![Fibonacci Axis](https://github.com/Kirken2004/tv-kir-ondulat/blob/develop/preview_fibonacci_axis_retracements.jpg?raw=true)
+
+![Fibonacci Axis](https://github.com/Kirken2004/tv-kir-ondulat/blob/main/preview_fibonacci_axis_retracements.jpg?raw=true)
 <p align="center">fig. 2 - The Fibonacci Axis and the Retracements</p>
-![Ichimoku Kynko Hyo and EMA](https://github.com/Kirken2004/tv-kir-ondulat/blob/develop/preview_ichimoku_ema.jpg?raw=true)
+
+![Ichimoku Kynko Hyo and EMA](https://github.com/Kirken2004/tv-kir-ondulat/blob/main/preview_ichimoku_ema.jpg?raw=true)
 <p align="center">fig. 3 - Ichimoku Kynko Hyo, Clouds and the EMA 200</p>
-![Kihon Sushi Tenkan](https://github.com/Kirken2004/tv-kir-ondulat/blob/develop/preview_kihon_sushi_tenkan_crossovers.jpg?raw=true)
+
+![Kihon Sushi Tenkan](https://github.com/Kirken2004/tv-kir-ondulat/blob/main/preview_kihon_sushi_tenkan_crossovers.jpg?raw=true)
 <p align="center">fig. 4 - Kihon Sushi and Tenkan Crossover Cycles</p>
-![Inputs Panel](https://github.com/Kirken2004/tv-kir-ondulat/blob/develop/preview_settings_inputs.jpg?raw=true)
+
+![Inputs Panel](https://github.com/Kirken2004/tv-kir-ondulat/blob/main/preview_settings_inputs.jpg?raw=true)
 <p align="center">fig. 5 - The Settings - The Inputs Panel</p>
-![Styles Panel](https://github.com/Kirken2004/tv-kir-ondulat/blob/develop/preview_settings_styles.jpg?raw=true)
+
+![Styles Panel](https://github.com/Kirken2004/tv-kir-ondulat/blob/main/preview_settings_styles.jpg?raw=true)
 <p align="center">fig. 6 - The Settings - The Styles Panel</p>
+
 
 
 ## Disclaimer
