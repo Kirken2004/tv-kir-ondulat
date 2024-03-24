@@ -1,7 +1,7 @@
 //@version=5
 indicator("Kir Ondulatoire", shorttitle="KOndulat", overlay=true)
 
-    // version 0.9.3
+    // version 0.9.4
 
     // Copyright (C) 2024  Kir
 
@@ -32,7 +32,7 @@ y3Input = input.price(PRICE_DEFAULT, "",        inline = "3", tooltip = "Pick po
 mult = input.bool(defval=false, title="Multiples E/N", inline="option1", group="Miscellaneous options")
 fibo = input.bool(defval=false, title="Fibonacci Axis", inline="option2", group="Miscellaneous options")
 tend = input.bool(defval=false, title="Stupid Linear Dir", inline="option3", group="Miscellaneous options")
-kisu = input.bool(defval=false, title="Kihon Sushi reminder", inline="option4", group="Miscellaneous options")
+kisu = input.bool(defval=false, title="Kihon Sushi reminder", inline="option4", group="Miscellaneous options", tooltip = "Need Tenkan crossovers to be displayed to add predictions")
 ichi = input.bool(defval=false, title="Draw Ichimoku", inline="option5", group="Miscellaneous options")
 crss = input.bool(defval=false, title="Display Tenkan Crossover Cycles", inline="option6", group="Miscellaneous options")
 dema = input.bool(defval=false, title="Draw EMA", inline="options7", group="Miscellaneous options")
@@ -86,7 +86,7 @@ conversionPeriods = input.int(9, minval=1, title="Conversion Line Length", group
 basePeriods = input.int(26, minval=1, title="Base Line Length", group="Ichimoku")
 laggingSpan2Periods = input.int(52, minval=1, title="Leading Span B Length", group="Ichimoku")
 displacement = input.int(26, minval=1, title="Lagging Span", group="Ichimoku")
-MaxLabels = input.int(5, minval=1, title="Maximum Crossover Labels", group="Ichimoku", tooltip = "An indicator is limited in the allowed amount of labels to draw. Keep this value low enough to prevent having lost labels.")
+MaxLabels = input.int(15, minval=1, title="Maximum Crossover Labels", group="Ichimoku", tooltip = "An indicator is limited in the allowed amount of labels to draw. Keep this value low enough to prevent having lost labels.")
 conversionLine = donchian(conversionPeriods)
 baseLine = donchian(basePeriods)
 leadLine1 = math.avg(conversionLine, baseLine)
@@ -499,13 +499,27 @@ fill(p1, p2, color = leadLine1 > leadLine2 ? color.rgb(67, 160, 71, 90) : color.
 // Display of the Tenkan Crossover Gaps
 if crss and barstate.islastconfirmedhistory
 
+    lastCrossover = array.get(crossoverBars, array.size(crossoverBars) - 1)
+    lastCrossoverDist = array.get(crossoverDist, array.size(crossoverBars) - 1)
+
     // Print the list of crossover bars and distances
     for i = array.size(crossoverBars) - 1 to 0
         int v = array.get(crossoverBars, i)
         int d = array.get(crossoverDist, i)
         labelCount := labelCount + 1
-        if labelCount <= 5
-            label.new(v, na, "⬅ " + str.format("{0, number, ###}", d), xloc.bar_index, yloc.abovebar, color.rgb(255, 0, 0), label.style_arrowdown, color.rgb(117, 188, 255), size.normal)
+        if labelCount <= MaxLabels
+            if i == array.size(crossoverBars) - 1
+                label.new(v, na, "⬅ " + str.format("{0, number, ###}", d) + "\n→" + str.format("{0, number, ###}", 1 + bar_index - lastCrossover), xloc.bar_index, yloc.abovebar, color.rgb(255, 0, 0), label.style_arrowdown, color.rgb(117, 188, 255), size.normal)
+            else    
+                label.new(v, na, "⬅ " + str.format("{0, number, ###}", d), xloc.bar_index, yloc.abovebar, color.rgb(255, 0, 0), label.style_arrowdown, color.rgb(117, 188, 255), size.normal)
+
+    // Kihon Suchi Cycles
+    if kisu
+        int[] cycles = array.from(9,17,26,33,42,51,65,76)
+        for i = array.size(cycles) - 1 to 0
+            cycle = array.get(cycles, i) + lastCrossBar
+            line.new(cycle, math.min(y1Input, y2Input, y3Input), cycle, math.max(y1Input, y2Input, y3Input), xloc.bar_index, extend.none, color.yellow, line.style_dotted, 1)
+        line.new(lastCrossover + lastCrossoverDist, math.min(y1Input, y2Input, y3Input), lastCrossover + lastCrossoverDist, math.max(y1Input, y2Input, y3Input), xloc.bar_index, extend.none, color.rgb(255, 217, 0), line.style_dashed, 1)
 
 // EMA
 out = ta.ema(src, len)

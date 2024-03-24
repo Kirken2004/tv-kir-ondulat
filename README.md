@@ -97,6 +97,10 @@ When the market is strongly bullish or bearish, it's not unusual to watch the pr
 
 The **SLP** stands for **Stupid Linear Prediction**. It's really just the direction the chart is heading into from the C point to now (now being the last confirmed bar). It has no real value. The calculated value shown in the purple label is the market price this chart would end up at if continuing in that direction, up to the **Target Time**.
 
+I also added a feature called **Tenkan Crossover Cycles**. An arrow is displayed above bars where a Tenkan crossing over the Kijun happened. The numerical value indicate the number of bars since the last event of that kind occured on the left. When the tenkan is crossing over, it's often accompanied by a movement up or down of the price. It's a change in the structure itself.
+
+The **Kihon Suchi** series describe a typical number of bars after which the Tenkan sen crosses over the Kijun sen. It's theory. And prone to errors by 2 due to the nature of bars in a timeframe. After the last crossing, one can expect to see the next one following that series. I added this indicator for fun. The dashed gold line is not on the series. It shows the bar in the future that correspond to the same cycle than the last one. The numbers of the series can be displayed at the bottom center of the chart. 
+
 At the moment, this indicator is tedious to use on several charts at once. You may require one layout(tab) per chart. Switching between symbols is not working. I wish i could draw several instances of this indicator on one chart. I'm pretty sure you'll find a comfy way to use it anyhow. 
 
 

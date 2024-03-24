@@ -1,5 +1,9 @@
 VERSION HISTORY
 
+    v0.9.4 - 03-24-2024
+
+        - fixed an oopsie on the Tenkan Crossover amount of labels limiter
+
     v0.9.3 - 03-23-2024
 
         - fixes and typos
