@@ -189,6 +189,8 @@ var labelFibo100 = label.new(x=na, y=na, text=" 100 %", color=color.rgb(120, 123
 var labelFibo123 = label.new(x=na, y=na, text=" 123 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGoal, style=label.style_label_left, xloc=xloc.bar_time)
 var labelFibo138 = label.new(x=na, y=na, text=" 138 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGoal, style=label.style_label_left, xloc=xloc.bar_time)
 var labelFibo161 = label.new(x=na, y=na, text=" 161 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGold, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo178 = label.new(x=na, y=na, text=" 178 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGold, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo200 = label.new(x=na, y=na, text=" 200 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGold, style=label.style_label_left, xloc=xloc.bar_time)
 
 var labelFiboN0 = label.new(x=na, y=na, text="-0 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
 var labelFiboN23 = label.new(x=na, y=na, text="-23.6 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
@@ -204,6 +206,7 @@ drawIndicator(Wave t) =>
     // Wave lines, Box and Arrows
     line.new(t.time1, t.price1, t.time2, t.price2, xloc = xloc.bar_time, color = t.lineColor, width=3, style=line.style_dotted)                                                                                                     // dotted impulse
     line.new(t.time2, t.price2, t.time3, t.price3, xloc = xloc.bar_time, color = t.lineColor, width=3, style=line.style_dotted)                                                                                                     // dotted correction
+    line.new(t.time3, t.price3, t.time5, t.price5, xloc = xloc.bar_time, color = t.lineColor, width=3, style=line.style_dotted)                                                                                                     // dotted D wave
     line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.price3 + t.priceDelta1, xloc = xloc.bar_time, color = t.arrowColor1, width=1, style=line.style_arrow_right)                                                               // orange arrow N (prime)
     line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice, xloc = xloc.bar_time, color = t.arrowColor2, width=1, style=line.style_arrow_right)                                                                          // blue arrow E (highest)
     line.new(t.boxTime0, t.price4, t.boxTime1, t.price4, xloc = xloc.bar_time, color = t.arrowColor1, width=1, style=line.style_dotted)                                                                                             // level N
@@ -428,6 +431,14 @@ drawIndicator(Wave t) =>
         line.new(offsetXFiboM, fibo161, offsetXFiboR, fibo161, xloc = xloc.bar_time, color = labelFiboTextColorGold, width=1, style=line.style_solid)    // 161%
         labelFibo161.set_x(offsetXFiboR), labelFibo161.set_y(fibo161)
 
+        var fibo178 = 178.4 * ((t.price4 - t.price3) / 100) + t.price3
+        line.new(offsetXFiboM, fibo178, offsetXFiboR, fibo178, xloc = xloc.bar_time, color = labelFiboTextColorGold, width=1, style=line.style_solid)    // 178%
+        labelFibo178.set_x(offsetXFiboR), labelFibo178.set_y(fibo178)
+
+        var fibo200 = 200.0 * ((t.price4 - t.price3) / 100) + t.price3
+        line.new(offsetXFiboM, fibo200, offsetXFiboR, fibo200, xloc = xloc.bar_time, color = labelFiboTextColorGold, width=1, style=line.style_solid)    // 200%
+        labelFibo200.set_x(offsetXFiboR), labelFibo200.set_y(fibo200)        
+
         line.new(offsetXFiboL, t.price2, offsetXFiboM, t.price2, xloc = xloc.bar_time, color = labelFiboTextColorNeg, width=1, style=line.style_solid)    // 0% at B
         labelFiboN0.set_x(offsetXFiboL), labelFiboN0.set_y(t.price2)    
 
@@ -454,8 +465,8 @@ drawIndicator(Wave t) =>
         line.new(offsetXFiboL, t.price1, offsetXFiboM, t.price1, xloc = xloc.bar_time, color = labelFiboTextColorNegCrash, width=1, style=line.style_solid)    // -100%
         labelFiboN100.set_x(offsetXFiboL), labelFiboN100.set_y(t.price1)
 
-        var topAxis = math.max(t.price1, t.price2, fibo161, t.price3)
-        var botAxis = math.min(t.price1, t.price2, fibo161, t.price3)
+        var topAxis = math.max(t.price1, t.price2, fibo200, t.price3)
+        var botAxis = math.min(t.price1, t.price2, fibo200, t.price3)
         line.new(offsetXFiboM, botAxis, offsetXFiboM, topAxis, xloc = xloc.bar_time, color = fiboAxisColor, width=1, style=line.style_solid)   // vertical scale axis
         
 formatPrice(float predi) =>
@@ -526,7 +537,14 @@ if barstate.islastconfirmedhistory
     wave.boxTopPrice4 := 4 * (wave.price4 - wave.price3) + (wave.boxTopPrice - wave.price4) + wave.price3
     wave.boxTopPrice5 := 5 * (wave.price4 - wave.price3) + (wave.boxTopPrice - wave.price4) + wave.price3
     wave.boxPriceDBot := (wave.price5 - wave.price1) * 0.5 + wave.price1
-    wave.boxPriceDTop := wave.boxPriceDBot + (wave.price5 - (wave.boxTopPrice2 - (wave.boxTopPrice - wave.price4)))             // Bot + (D - 2N)
+    float proxy = wave.boxTopPrice                                              // FIXME please do way better than this
+    if (wave.price5 > wave.price4)
+        proxy := wave.price4
+    if (wave.price5 > wave.boxTopPrice)
+        proxy := wave.boxTopPrice
+    if (wave.price5 > (wave.boxTopPrice2 - (wave.boxTopPrice - wave.price4)))
+        proxy := (wave.boxTopPrice2 - (wave.boxTopPrice - wave.price4))
+    wave.boxPriceDTop := wave.boxPriceDBot + (wave.price5 - proxy)             // Bot + (D - 2N or D - E or D - N)
     wave.boxTime2 := (wave.time5 - wave.time3) + wave.time5
     wave.boxTime3 := (wave.time5 - wave.time1) + wave.time5
     wave.barWidthInPixels := math.abs(bar_index - bar_index[1])
