@@ -3,6 +3,10 @@ VERSION HISTORY
     v0.9.4 - 03-24-2024
 
         - fixed an oopsie on the Tenkan Crossover amount of labels limiter
+        - fixed the number of bars between A and B and C (the number in the above the bar label was not including A in the count)
+        - added P Target as B + (A - C)
+        - found a gremlins who messed with the calculus of the multiples of N and E
+        - added a prediction for an E Wave based on ZS's approach
 
     v0.9.3 - 03-23-2024
 
