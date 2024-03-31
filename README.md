@@ -90,14 +90,14 @@ The **NT arrow** is almost the opposite, it's what the market would have done at
 
 The **V arrow** is what the market would have done if the sign of BC had been reversed. 
 
-The indicator loses his relevance when the **Retracement BC** is lower than 33%.
+The indicator loses some of its relevance when the **Retracement BC** is lower than 33%.
 Above that, arrows **N, V, E** and **NT** can still reveal potential targets.
 
 When the market is strongly bullish or bearish, it's not unusual to watch the price go crazy above or below the window. In such cases, the chart may follow a strength arrow that is a multiple of **E** or **N**. That's why this script has an option to display those multiples as new attractive targets. Take notes that 5E/5N are irrational targets.
 
-The **SLP** stands for **Stupid Linear Prediction**. It's really just the direction the chart is heading into from the C point to now (now being the last confirmed bar). It has no real value. The calculated value shown in the purple label is the market price this chart would end up at if continuing in that direction, up to the **Target Time**.
+The **SLP** stands for **Straight Linear Projection**. It's really just the direction the chart is heading into from the C point to now (now being the last confirmed bar). It has no real value. The calculated value shown in the purple label is the market price this chart would end up at if continuing in that direction, up to the **Target Time**.
 
-I also added a feature called **Tenkan Crossover Cycles**. An arrow is displayed above bars where a Tenkan crossing over the Kijun happened. The numerical value indicate the number of bars since the last event of that kind occured on the left. When the tenkan is crossing over, it's often accompanied by a movement up or down of the price. It's a change in the structure itself.
+I also added a feature called **Tenkan Crossover Markers**. An arrow is displayed above bars when a Tenkan crossed over the Kijun. The numerical value indicate the number of bars since the last event of that kind occured on the left. When the tenkan is crossing over, it's often accompanied by a movement up or down of the price. It's a change in the structure itself. It's important to follow those crossovers. 
 
 The **Kihon Suchi** series describe a typical number of bars after which the Tenkan sen crosses over the Kijun sen. It's theory. And prone to errors by 2 due to the nature of bars in a timeframe. After the last crossing, one can expect to see the next one following that series. I added this indicator for fun. The dashed gold line is not on the series. It shows the bar in the future that correspond to the same cycle than the last one. The numbers of the series can be displayed at the bottom center of the chart. 
 
@@ -134,6 +134,10 @@ No. Probably not. I'll get bored very quickly on that subject.
         - Ichimoku Kinko Hyo Part 3 [https://www.youtube.com/watch?v=iKyue8rugmw]
         - Ichimoku Kinko Hyo Part 4 [https://www.youtube.com/watch?v=4HJgaYwahyg]
         - Ichimoku Kinko Hyo Part 5 [https://www.youtube.com/watch?v=fM4s_piN-Ps]
+
+    - ChaosTrader63's channel (English)
+
+        - Trading Ichimoku Kinko Hyo Three Roles With Wave, Price, & Time Theories [https://www.youtube.com/watch?v=CIjWEsr0Cgo]
 
     - ZS Trader's Masterclasses (French)
 

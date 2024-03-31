@@ -31,13 +31,16 @@ y3Input = input.price(PRICE_DEFAULT, "",        inline = "3", tooltip = "Pick po
 x4Input = input.time(TIME_DEFAULT,   "Point D", inline = "4", confirm = true)
 y4Input = input.price(PRICE_DEFAULT, "",        inline = "4", tooltip = "Pick point D (place before C to ignore)", confirm = true)
 
-mult = input.bool(defval=false, title="Multiples E/N", inline="option1", group="Miscellaneous options")
+mult = input.bool(defval=false, title="Multiples of E/N waves", inline="option1", group="Miscellaneous options")
 fibo = input.bool(defval=false, title="Fibonacci Axis", inline="option2", group="Miscellaneous options")
-tend = input.bool(defval=false, title="Stupid Linear Dir", inline="option3", group="Miscellaneous options")
-kisu = input.bool(defval=false, title="Kihon Sushi reminder", inline="option4", group="Miscellaneous options", tooltip = "Need Tenkan crossovers to be displayed to add predictions")
-ichi = input.bool(defval=false, title="Draw Ichimoku", inline="option5", group="Miscellaneous options")
-crss = input.bool(defval=false, title="Display Tenkan Crossover Cycles", inline="option6", group="Miscellaneous options")
-dema = input.bool(defval=false, title="Draw EMA", inline="options7", group="Miscellaneous options")
+tend = input.bool(defval=false, title="Straight Linear Projection", inline="option3", group="Miscellaneous options")
+kisu = input.bool(defval=false, title="Kihon Suchi series", inline="option4", group="Miscellaneous options", tooltip = "Need Tenkan crossovers to be displayed to add predictions")
+ichi = input.bool(defval=false, title="Ichimoku Kinko Hyo", inline="option5", group="Miscellaneous options")
+crss = input.bool(defval=false, title="Tenkan Crossover Markers", inline="option6", group="Miscellaneous options")
+dema = input.bool(defval=false, title="EMA", inline="options7", group="Miscellaneous options")
+labp = input.bool(defval=false, title="Prices in labels", inline="options8", group="Miscellaneous options")
+tren = input.bool(defval=false, title="Wave Trend Lines", inline="options9", group="Miscellaneous options", tooltip = "Only visibles if D label is also visible. Help to visually confirm if ABCD is an N/Y/P wave.")
+ac26 = input.bool(defval=false, title="26 periods after A/C", inline="options10", group="Miscellaneous options", tooltip = "The Kumo cloud between those two deadlines gives an active area to keep an eye on. Up to you to draw a bounding box there.")
 
 int realtimeTime = 1
 float realtimePrice = 1.0
@@ -50,12 +53,12 @@ type Wave
     int   time2
     int   time3
     int   time4
-    int   time5
+    int   timeD
     float price1
     float price2
     float price3
     float price4
-    float price5
+    float priceD
     color lineColor
     color arrowColor1
     color arrowColor2
@@ -65,12 +68,10 @@ type Wave
     float priceDelta2
     int   timeDelta1
     int   timeDelta2
-    float pcChange1
-    float pcChange2
     int   boxTime0
     int   boxTime1
-    int   boxTime2
-    int   boxTime3
+    int   boxTimeE0
+    int   boxTimeE1
     float boxTopPrice
     float boxTopPrice2
     float boxTopPrice3
@@ -79,11 +80,15 @@ type Wave
     float boxVPrice
     float boxNtPrice
     float boxPPrice
-    float boxPriceDTop
-    float boxPriceDBot
+    float boxPriceETop
+    float boxPriceEBot
     float currentPrice
+    float midADPrice
     int   currentTime
     int   barWidthInPixels
+    bool  nWave
+    bool  pWave
+    bool  yWave
 
 // Fibonacci stuff
 fiboBarWidth = input.int(2, minval=-1000, maxval=1000, title="Fibo width in bars", group="Fibonacci Axis", tooltip = "Due to the lack of scale/zoom detection, the width of the graduations is expressed in a multiplier of bar width")
@@ -95,7 +100,7 @@ conversionPeriods = input.int(9, minval=1, title="Conversion Line Length", group
 basePeriods = input.int(26, minval=1, title="Base Line Length", group="Ichimoku")
 laggingSpan2Periods = input.int(52, minval=1, title="Leading Span B Length", group="Ichimoku")
 displacement = input.int(26, minval=1, title="Lagging Span", group="Ichimoku")
-MaxLabels = input.int(15, minval=1, title="Maximum Crossover Labels", group="Ichimoku", tooltip = "An indicator is limited in the allowed amount of labels to draw. Keep this value low enough to prevent having lost labels.")
+MaxLabels = input.int(7, minval=1, title="Maximum Crossover Labels", group="Ichimoku", tooltip = "An indicator is limited in the allowed amount of labels to draw. Keep this value low enough to prevent having lost labels.")
 conversionLine = donchian(conversionPeriods)
 baseLine = donchian(basePeriods)
 leadLine1 = math.avg(conversionLine, baseLine)
@@ -139,13 +144,6 @@ _barForTime(_t) =>
     if time_close[1] <= _t and time >= _t
         _bar := bar_index
     _bar
-
-nBar1 = _barForTime(x1Input)
-nBar2 = _barForTime(x2Input)
-deltaBar1 = nBar2 - nBar1
-
-calculatePercentageChange(highPrice, lowPrice) =>
-    ((highPrice - lowPrice) / lowPrice) * 100
 
 nb_seconds = timeframe.in_seconds(timeframe.period)
 
@@ -204,17 +202,27 @@ var labelFiboN100 = label.new(x=na, y=na, text=" -100 %", color=color.rgb(120, 1
 drawIndicator(Wave t) =>
 
     // Wave lines, Box and Arrows
-    line.new(t.time1, t.price1, t.time2, t.price2, xloc = xloc.bar_time, color = t.lineColor, width=3, style=line.style_dotted)                                                                                                     // dotted impulse
-    line.new(t.time2, t.price2, t.time3, t.price3, xloc = xloc.bar_time, color = t.lineColor, width=3, style=line.style_dotted)                                                                                                     // dotted correction
-    line.new(t.time3, t.price3, t.time5, t.price5, xloc = xloc.bar_time, color = t.lineColor, width=3, style=line.style_dotted)                                                                                                     // dotted D wave
-    line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.price3 + t.priceDelta1, xloc = xloc.bar_time, color = t.arrowColor1, width=1, style=line.style_arrow_right)                                                               // orange arrow N (prime)
-    line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice, xloc = xloc.bar_time, color = t.arrowColor2, width=1, style=line.style_arrow_right)                                                                          // blue arrow E (highest)
-    line.new(t.boxTime0, t.price4, t.boxTime1, t.price4, xloc = xloc.bar_time, color = t.arrowColor1, width=1, style=line.style_dotted)                                                                                             // level N
-    line.new(t.boxTime0, t.boxTopPrice, t.boxTime1, t.boxTopPrice, xloc = xloc.bar_time, color = t.arrowColor2, width=1, style=line.style_dotted)                                                                                   // level E
-    line.new(t.boxTime0, t.boxVPrice, t.boxTime1, t.boxVPrice, xloc = xloc.bar_time, color = t.arrowColor3, width=1, style=line.style_dotted)                                                                                       // level V
-    line.new(t.boxTime0, t.boxNtPrice, t.boxTime1, t.boxNtPrice, xloc = xloc.bar_time, color = t.arrowColor4, width=1, style=line.style_dotted)                                                                                     // level Nt
-    line.new(t.boxTime0, t.boxPPrice, t.boxTime1, t.boxPPrice, xloc = xloc.bar_time, color = t.arrowColor4, width=1, style=line.style_dotted)                                                                                       // level P
+    line.new(t.time1, t.price1, t.time2, t.price2, xloc = xloc.bar_time, color = t.lineColor, width=3, style=line.style_dotted)                                                                                                         // dotted impulse
+    line.new(t.time2, t.price2, t.time3, t.price3, xloc = xloc.bar_time, color = t.lineColor, width=3, style=line.style_dotted)                                                                                                         // dotted correction
+    line.new(t.time3, t.price3, t.timeD, t.priceD, xloc = xloc.bar_time, color = t.lineColor, width=3, style=line.style_dotted)                                                                                                         // dotted D wave
+    line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.price3 + t.priceDelta1, xloc = xloc.bar_time, color = t.arrowColor1, width=1, style=line.style_arrow_right)                                                                   // orange arrow N (prime)        C+(B-A)
+    line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice, xloc = xloc.bar_time, color = t.arrowColor2, width=1, style=line.style_arrow_right)                                                                              // blue arrow E (highest/lowest) B+(B-A)
+    line.new(t.boxTime0, t.price4, t.boxTime1, t.price4, xloc = xloc.bar_time, color = t.arrowColor1, width=1, style=line.style_dotted)                                                                                                 // level N
+    line.new(t.boxTime0, t.boxTopPrice, t.boxTime1, t.boxTopPrice, xloc = xloc.bar_time, color = t.arrowColor2, width=1, style=line.style_dotted)                                                                                       // level E
+    line.new(t.boxTime0, t.boxVPrice, t.boxTime1, t.boxVPrice, xloc = xloc.bar_time, color = t.arrowColor3, width=1, style=line.style_dotted)                                                                                           // level V
+    if t.pWave == false
+        line.new(t.boxTime0, t.boxNtPrice, t.boxTime1, t.boxNtPrice, xloc = xloc.bar_time, color = t.arrowColor4, width=1, style=line.style_dotted)                                                                                     // level Nt
+    if t.pWave
+        line.new(t.boxTime0, t.boxPPrice, t.boxTime1, t.boxPPrice, xloc = xloc.bar_time, color = t.arrowColor4, width=1, style=line.style_dotted)                                                                                       // level P
     
+    if ac26
+        int time1plus26 = t.time1 + (26 * nb_seconds * 1000)
+        int time3plus26 = t.time3 + (26 * nb_seconds * 1000)
+        float highest = math.max(t.price1, t.price2, t.price3, t.priceD, t.boxTopPrice)
+        float lowest = math.min(t.price1, t.price2, t.price3, t.priceD, t.boxTopPrice)
+        line.new(time1plus26, highest, time1plus26, lowest, xloc = xloc.bar_time, color = color.orange, width=1, style=line.style_dotted)                                                                                             // time A + 26 periods
+        line.new(time3plus26, highest, time3plus26, lowest, xloc = xloc.bar_time, color = color.orange, width=1, style=line.style_dotted)                                                                                             // time C + 26 periods
+
     if mult
         line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice2, xloc = xloc.bar_time, color = t.arrowColor2, width=1, style=line.style_arrow_right)                                                                         // blue arrow 2E (highest)
         line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice2 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = t.arrowColor1, width=1, style=line.style_arrow_right)                                            // orange arrow 2N (prime)
@@ -233,13 +241,15 @@ drawIndicator(Wave t) =>
         line.new(t.boxTime0, t.boxTopPrice5 - (t.boxTopPrice - t.price4), t.boxTime1, t.boxTopPrice5 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = t.arrowColor1, width=1, style=line.style_dotted)                       // level 5N
         line.new(t.boxTime0, t.boxTopPrice5, t.boxTime1, t.boxTopPrice5, xloc = xloc.bar_time, color = t.arrowColor2, width=1, style=line.style_dotted)                                                                                 // level 5E
 
-    line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxVPrice, xloc = xloc.bar_time, color = t.arrowColor3, width=1, style=line.style_arrow_right)                                                                            // red arrow V
-    line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxNtPrice, xloc = xloc.bar_time, color = t.arrowColor4, width=1, style=line.style_arrow_right)                                                                           // green arrow Nt (lowest)
-    line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxPPrice, xloc = xloc.bar_time, color = t.arrowColor4, width=1, style=line.style_arrow_right)                                                                           // lime arrow P
-    line.new(t.time3 + t.timeDelta2 - nb_seconds, t.price3, t.time3 + t.timeDelta2 - nb_seconds, t.boxTopPrice, xloc = xloc.bar_time, color = t.arrowColor3, width=1, style=line.style_dashed)                                      // dashed at double correction time
+    line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxVPrice, xloc = xloc.bar_time, color = t.arrowColor3, width=1, style=line.style_arrow_right)                                                                                // red arrow V      B+(B-C)
+    if t.pWave == false
+        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxNtPrice, xloc = xloc.bar_time, color = t.arrowColor4, width=1, style=line.style_arrow_right)                                                                           // green arrow Nt   C+(C-A)
+    if t.pWave
+        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxPPrice, xloc = xloc.bar_time, color = t.arrowColor4, width=1, style=line.style_arrow_right)                                                                            // lime arrow P
+    line.new(t.time3 + t.timeDelta2 - nb_seconds, t.price3, t.time3 + t.timeDelta2 - nb_seconds, t.boxTopPrice, xloc = xloc.bar_time, color = t.arrowColor3, width=1, style=line.style_dashed)                                          // dashed at double correction time
 
-    box.new(t.boxTime0, t.boxTopPrice, t.boxTime1, t.price3, border_color = color.teal, border_width = 1, border_style = line.style_solid, bgcolor = na, xloc=xloc.bar_time)                                                        // target box deadline
-    line.new(t.time3 + t.timeDelta1, t.boxTopPrice, t.time3 + t.timeDelta1, t.price3, xloc=xloc.bar_time, style = line.style_dashed, width = 1, color=color.teal)                                                                   // target dateline
+    box.new(t.boxTime0, t.boxTopPrice, t.boxTime1, t.price3, border_color = color.teal, border_width = 1, border_style = line.style_solid, bgcolor = na, xloc=xloc.bar_time)                                                          // target box deadline
+    line.new(t.time3 + t.timeDelta1, t.boxTopPrice, t.time3 + t.timeDelta1, t.price3, xloc=xloc.bar_time, style = line.style_dashed, width = 1, color=color.teal)                                                                     // target dateline
 
     // toggle the direction of things considering the relation between time A and time B
     var styleABC = label.style_label_up
@@ -255,9 +265,12 @@ drawIndicator(Wave t) =>
     pointFillColor = color.rgb(105, 155, 255)
 
     // Wave labels
-    label.new(t.time1, t.price1, "A", xloc.bar_time, yloc.price, pointFillColor, styleABC, pointTextColor, size.small, text.align_center)
-    label.new(t.time2, t.price2, "B\n" + str.format("{0, number, ###}", 1 + ((t.time2 - t.time1) / nb_seconds / 1000)), xloc.bar_time, yloc.price, pointFillColor, styleABC2, pointTextColor, size.small, text.align_center)
-    label.new(t.time3, t.price3, "C\n" + str.format("{0, number, ###}", 1 + ((t.time3 - t.time1 + 1.001) / nb_seconds / 1000)), xloc.bar_time, yloc.price, pointFillColor, styleABC, pointTextColor, size.small, text.align_center)
+    var textA = "A" + (labp ? "\n" + str.format("{0, number, #.##}", t.price1) : "")
+    var textB = "B\n" + str.format("{0, number, ###}", 1 + ((t.time2 - t.time1) / nb_seconds / 1000)) + (labp ? "\n" + str.format("{0, number, #.##}", t.price2) : "")
+    var textC = "C\n" + str.format("{0, number, ###}", 1 + ((t.time3 - t.time1 + 1.001) / nb_seconds / 1000)) + (labp ? "\n" + str.format("{0, number, #.##}", t.price3) : "")
+    label.new(t.time1, t.price1, textA, xloc.bar_time, yloc.price, pointFillColor, styleABC, pointTextColor, size.small, text.align_center)
+    label.new(t.time2, t.price2, textB, xloc.bar_time, yloc.price, pointFillColor, styleABC2, pointTextColor, size.small, text.align_center)
+    label.new(t.time3, t.price3, textC, xloc.bar_time, yloc.price, pointFillColor, styleABC, pointTextColor, size.small, text.align_center)
 
     // Compute tenth (deciles) of the box duration
     priceDeci = (t.price4 - t.price3) / 10
@@ -311,15 +324,17 @@ drawIndicator(Wave t) =>
     labelTargetPriceV.set_yloc(yloc.price)
     labelTargetPriceV.set_text("V=" + str.format("{0, number, #.##}", t.boxVPrice))
 
-    labelTargetPriceNt.set_x(t.boxTime1)
-    labelTargetPriceNt.set_y(t.boxNtPrice)
-    labelTargetPriceNt.set_yloc(yloc.price)
-    labelTargetPriceNt.set_text("NT=" + str.format("{0, number, #.##}", t.boxNtPrice))
+    if t.pWave == false
+        labelTargetPriceNt.set_x(t.boxTime1)
+        labelTargetPriceNt.set_y(t.boxNtPrice)
+        labelTargetPriceNt.set_yloc(yloc.price)
+        labelTargetPriceNt.set_text("NT=" + str.format("{0, number, #.##}", t.boxNtPrice))
 
-    labelTargetPriceP.set_x(t.boxTime1)
-    labelTargetPriceP.set_y(t.boxPPrice)
-    labelTargetPriceP.set_yloc(yloc.price)
-    labelTargetPriceP.set_text("P=" + str.format("{0, number, #.##}", t.boxPPrice))
+    if t.pWave
+        labelTargetPriceP.set_x(t.boxTime1)
+        labelTargetPriceP.set_y(t.boxPPrice)
+        labelTargetPriceP.set_yloc(yloc.price)
+        labelTargetPriceP.set_text("P=" + str.format("{0, number, #.##}", t.boxPPrice))
         
     if mult
         labelTargetPrice2E.set_x(t.boxTime1)
@@ -363,27 +378,33 @@ drawIndicator(Wave t) =>
         labelTargetPrice5N.set_text("5N=" + str.format("{0, number, #.##}", t.boxTopPrice5 - (t.boxTopPrice - t.price4)))
 
     // If Point D has been placed after Point C, we have some prediction to make
-    if t.time5 > t.time3
-        box.new(t.boxTime2, t.boxPriceDBot, t.boxTime3, t.boxPriceDTop, bgcolor = color.rgb(0,0,0,100), border_color = color.aqua, xloc = xloc.bar_time, border_width = 1)
-        line.new(t.time5, t.price5, t.boxTime2, t.boxPriceDTop, xloc=xloc.bar_time, color=color.aqua, style = line.style_arrow_right, width=1)
-        line.new(t.time5, t.price5, t.boxTime3, t.boxPriceDTop, xloc=xloc.bar_time, color=color.aqua, style = line.style_arrow_right, width=1)
-        label.new(t.time5, t.price5, "D\n" + str.format("{0, number, ###}", 1 + ((t.time5 - t.time1) / nb_seconds / 1000)) + "\n" + str.format("{0, number, #.##}", t.price5), xloc.bar_time, yloc.price, pointFillColor, styleABC2, pointTextColor, size.small, text.align_center)
-        labelTargetPriceETop.set_x(t.boxTime3)
-        labelTargetPriceETop.set_y(t.boxPriceDTop)
+    if t.timeD > t.time3
+        box.new(t.boxTimeE0, t.boxPriceEBot, t.boxTimeE1, t.boxPriceETop, bgcolor = color.rgb(0,0,0,100), border_color = color.aqua, xloc = xloc.bar_time, border_width = 1)
+        line.new(t.timeD, t.priceD, t.boxTimeE0, t.boxPriceETop, xloc=xloc.bar_time, color=color.aqua, style = line.style_arrow_right, width=1)
+        line.new(t.timeD, t.priceD, t.boxTimeE1, t.boxPriceETop, xloc=xloc.bar_time, color=color.aqua, style = line.style_arrow_right, width=1)
+        label.new(t.timeD, t.priceD, "D\n" + str.format("{0, number, ###}", 1 + ((t.timeD - t.time1) / nb_seconds / 1000)) + (labp ? "\n" + str.format("{0, number, #.##}", t.priceD) : ""), xloc.bar_time, yloc.price, pointFillColor, styleABC2, pointTextColor, size.small, text.align_center)
+        labelTargetPriceETop.set_x(t.boxTimeE1)
+        labelTargetPriceETop.set_y(t.boxPriceETop)
         labelTargetPriceETop.set_yloc(yloc.price)
-        labelTargetPriceETop.set_text(str.format("{0, number, #.##}", t.boxPriceDTop))        
-        labelTargetPriceEBot.set_x(t.boxTime3)
-        labelTargetPriceEBot.set_y(t.boxPriceDBot)
+        labelTargetPriceETop.set_text(str.format("{0, number, #.##}", t.boxPriceETop))        
+        labelTargetPriceEBot.set_x(t.boxTimeE1)
+        labelTargetPriceEBot.set_y(t.boxPriceEBot)
         labelTargetPriceEBot.set_yloc(yloc.price)
-        labelTargetPriceEBot.set_text(str.format("{0, number, #.##}", t.boxPriceDBot))
-        labelBeforeTargetETime.set_x(t.boxTime2)
-        labelBeforeTargetETime.set_y(t.boxPriceDBot)
+        labelTargetPriceEBot.set_text(str.format("{0, number, #.##}", t.boxPriceEBot))
+        labelBeforeTargetETime.set_x(t.boxTimeE0)
+        labelBeforeTargetETime.set_y(t.boxPriceEBot)
         labelBeforeTargetETime.set_yloc(yloc.price)
-        labelBeforeTargetETime.set_text(str.format_time(t.boxTime2, 'dd-MMM-yyyy\nHH:mm:ss', "UTC+2"))
-        labelAfterTargetETime.set_x(t.boxTime3)
-        labelAfterTargetETime.set_y(t.boxPriceDBot)
+        labelBeforeTargetETime.set_text(str.format_time(t.boxTimeE0, 'dd-MMM-yyyy\nHH:mm:ss', "UTC+2"))
+        labelAfterTargetETime.set_x(t.boxTimeE1)
+        labelAfterTargetETime.set_y(t.boxPriceEBot)
         labelAfterTargetETime.set_yloc(yloc.price)
-        labelAfterTargetETime.set_text(str.format_time(t.boxTime3, 'dd-MMM-yyyy\nHH:mm:ss', "UTC+2"))        
+        labelAfterTargetETime.set_text(str.format_time(t.boxTimeE1, 'dd-MMM-yyyy\nHH:mm:ss', "UTC+2"))        
+        if t.priceD < t.price3
+            labelBeforeTargetETime.set_style(label.style_label_down)
+            labelAfterTargetETime.set_style(label.style_label_down)
+        if tren
+            line.new(t.time1, t.price1, t.time3, t.price3, xloc=xloc.bar_time, color=color.green, style = line.style_solid, width=1, extend = extend.both)
+            line.new(t.time2, t.price2, t.timeD, t.priceD, xloc=xloc.bar_time, color=color.green, style = line.style_solid, width=1, extend = extend.both)
 
     if fibo
         var offsetXFiboM = (nb_seconds * 1000 * fiboBarOffset) + t.time2
@@ -509,12 +530,15 @@ if barstate.islastconfirmedhistory
     wave.time2  := x2Input
     wave.time3  := x3Input
     wave.time4  := x3Input + (x2Input - x1Input)
-    wave.time5  := x4Input
+    wave.timeD  := x4Input
     wave.price1 := y1Input
     wave.price2 := y2Input
     wave.price3 := y3Input
     wave.price4 := y3Input + (y2Input - y1Input)                                // N:   
-    wave.price5 := y4Input
+    wave.priceD := y4Input
+    wave.pWave  := ((wave.price1 > wave.price2 and wave.price3 < wave.price1 and wave.priceD > wave.price2) or (wave.price2 > wave.price1 and wave.price3 > wave.price1 and wave.priceD < wave.price2)) ? true : false
+    wave.yWave  := ((wave.price1 > wave.price2 and wave.price3 > wave.price1 and wave.priceD < wave.price2) or (wave.price2 > wave.price1 and wave.price3 < wave.price1 and wave.priceD > wave.price2)) ? true : false
+    wave.nWave  := (wave.pWave or wave.yWave) ? false : true
     wave.lineColor := color.rgb(255, 255, 255, 66)
     wave.arrowColor1 := color.orange
     wave.arrowColor2 := color.blue
@@ -524,8 +548,6 @@ if barstate.islastconfirmedhistory
     wave.priceDelta2 := y3Input - y2Input
     wave.timeDelta1 := x2Input - x1Input
     wave.timeDelta2 := x3Input - x2Input
-    wave.pcChange1 := calculatePercentageChange(y2Input, y1Input)
-    wave.pcChange2 := calculatePercentageChange(y3Input, y2Input)
     wave.boxTime0 := wave.time4 - wave.timeDelta2
     wave.boxTime1 := wave.time4 + wave.timeDelta2
     wave.boxTopPrice := (wave.price2 - wave.price1) + wave.price2               // E:  BD = AB
@@ -536,17 +558,29 @@ if barstate.islastconfirmedhistory
     wave.boxTopPrice3 := 3 * (wave.price4 - wave.price3) + (wave.boxTopPrice - wave.price4) + wave.price3
     wave.boxTopPrice4 := 4 * (wave.price4 - wave.price3) + (wave.boxTopPrice - wave.price4) + wave.price3
     wave.boxTopPrice5 := 5 * (wave.price4 - wave.price3) + (wave.boxTopPrice - wave.price4) + wave.price3
-    wave.boxPriceDBot := (wave.price5 - wave.price1) * 0.5 + wave.price1
+    wave.midADPrice := (math.abs(wave.priceD - wave.price1) * 0.5) + math.min(wave.price1, wave.priceD)                         // FIXME not really AD mid, have to find low and high of A,B,C,D
+    wave.boxPriceEBot := wave.midADPrice
     float proxy = wave.boxTopPrice                                              // FIXME please do way better than this
-    if (wave.price5 > wave.price4)
+    if (wave.priceD > wave.price4)
         proxy := wave.price4
-    if (wave.price5 > wave.boxTopPrice)
+    if (wave.priceD > wave.boxTopPrice)
         proxy := wave.boxTopPrice
-    if (wave.price5 > (wave.boxTopPrice2 - (wave.boxTopPrice - wave.price4)))
+    if (wave.priceD > (wave.boxTopPrice2 - (wave.boxTopPrice - wave.price4)))
         proxy := (wave.boxTopPrice2 - (wave.boxTopPrice - wave.price4))
-    wave.boxPriceDTop := wave.boxPriceDBot + (wave.price5 - proxy)             // Bot + (D - 2N or D - E or D - N)
-    wave.boxTime2 := (wave.time5 - wave.time3) + wave.time5
-    wave.boxTime3 := (wave.time5 - wave.time1) + wave.time5
+    wave.boxPriceETop := wave.boxPriceEBot + (wave.priceD - proxy)             // Bot + (D - 2N or D - E or D - N)
+    if wave.priceD < wave.midADPrice
+        if (wave.priceD < wave.price4)
+            proxy := wave.price4
+        if (wave.priceD < wave.boxTopPrice)
+            proxy := wave.boxTopPrice
+        if (wave.priceD < (wave.boxTopPrice2 - (wave.boxTopPrice - wave.price4)))
+            proxy := (wave.boxTopPrice2 - (wave.boxTopPrice - wave.price4))
+        wave.boxPriceETop := wave.boxPriceEBot - math.abs(wave.priceD - proxy)             // Bot + (D - 2N or D - E or D - N)        
+        // float temp = wave.boxPriceETop
+        // wave.boxPriceETop := wave.boxPriceEBot
+        // wave.boxPriceEBot := temp
+    wave.boxTimeE0 := (wave.timeD - wave.time3) + wave.timeD
+    wave.boxTimeE1 := (wave.timeD - wave.time1) + wave.timeD
     wave.barWidthInPixels := math.abs(bar_index - bar_index[1])
 
     drawIndicator(wave)
@@ -558,10 +592,10 @@ if barstate.islast
 
 // Ichimoku stuff
 plot(ichi ? conversionLine : na, color=#4385ff, title="Tekan Conversion Line")                                        // TENKAN SEN
-plot(ichi ? baseLine : na, color=#f83737, title="Kijun Base Line")                                                    // KIJUN SEN
-plot(ichi ? close : na, offset = -displacement + 1, color=#43A047, title="Lagging Span")
-p1 = plot(ichi ? leadLine1 : na, offset = displacement - 1, color=#A5D6A7, title="Leading Span A")
-p2 = plot(ichi ? leadLine2 : na, offset = displacement - 1, color=#EF9A9A, title="Leading Span B")
+plot(ichi ? baseLine : na, color=#f83737, title="Kijun Reference Line")                                                    // KIJUN SEN
+plot(ichi ? close : na, offset = -displacement + 1, color=#43A047, title="Lagging Chikou Span")
+p1 = plot(ichi ? leadLine1 : na, offset = displacement - 1, color=#A5D6A7, title="Leading Senkou Span A")
+p2 = plot(ichi ? leadLine2 : na, offset = displacement - 1, color=#EF9A9A, title="Leading Senkou Span B")
 //plot(ichi ? (leadLine1 > leadLine2 ? leadLine1 : leadLine2) : na, offset = displacement - 1, title = "Kumo Cloud Upper Line", color = #7eff83, display = display.none)
 //plot(ichi ? (leadLine1 < leadLine2 ? leadLine1 : leadLine2) : na, offset = displacement - 1, title = "Kumo Cloud Lower Line", color = #ff6464, display = display.none)
 fill(p1, p2, color = leadLine1 > leadLine2 ? color.rgb(67, 160, 71, 90) : color.rgb(244, 67, 54, 90))
@@ -585,7 +619,7 @@ if crss and barstate.islastconfirmedhistory
 
     // Kihon Suchi Cycles
     if kisu
-        int[] cycles = array.from(9,17,26,33,42,51,65,76)
+        int[] cycles = array.from(9,17,26,33,42,51,65,76,83,97,101,151,226)
         for i = array.size(cycles) - 1 to 0
             cycle = array.get(cycles, i) + lastCrossBar
             line.new(cycle, math.min(y1Input, y2Input, y3Input), cycle, math.max(y1Input, y2Input, y3Input), xloc.bar_index, extend.none, color.yellow, line.style_dotted, 1)
