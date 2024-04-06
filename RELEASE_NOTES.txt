@@ -1,5 +1,10 @@
 VERSION HISTORY
 
+    v0.9.5 - 05-06-2024
+
+        - fixed the labels around the E-Box
+        - improved the documentation
+
     v0.9.4 - 04-06-2024
 
         - added the case of A/B/C is the beginning of an S-Wave (more than 100% of BC retracement over AB)

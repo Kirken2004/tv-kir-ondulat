@@ -98,6 +98,7 @@ type Wave
     float boxPriceETop
     float boxPriceEBot
     float boxPriceEAnchor
+    float boxPriceELabels
     float currentPrice
     float midADPrice
     int   currentTime
@@ -439,14 +440,14 @@ drawIndicator(Wave t) =>
         labelTargetPriceEBot.set_yloc(yloc.price)
         labelTargetPriceEBot.set_text(str.format("{0, number, #.####}", t.boxPriceEBot))
         labelBeforeTargetETime.set_x(t.boxTimeE0)
-        labelBeforeTargetETime.set_y(t.boxPriceEBot)
+        labelBeforeTargetETime.set_y(t.boxPriceELabels)
         labelBeforeTargetETime.set_yloc(yloc.price)
         labelBeforeTargetETime.set_text(str.format_time(t.boxTimeE0, 'dd-MMM-yyyy\nHH:mm:ss', "UTC+2"))
         labelAfterTargetETime.set_x(t.boxTimeE1)
-        labelAfterTargetETime.set_y(t.boxPriceEBot)
+        labelAfterTargetETime.set_y(t.boxPriceELabels)
         labelAfterTargetETime.set_yloc(yloc.price)
         labelAfterTargetETime.set_text(str.format_time(t.boxTimeE1, 'dd-MMM-yyyy\nHH:mm:ss', "UTC+2"))        
-        if t.priceD < t.price3
+        if t.priceD < t.boxPriceELabels
             labelBeforeTargetETime.set_style(label.style_label_down)
             labelAfterTargetETime.set_style(label.style_label_down)
 
@@ -649,6 +650,7 @@ if barstate.islastconfirmedhistory
     wave.boxTimeE0 := (wave.timeD - wave.time3) + wave.timeD
     wave.boxTimeE1 := (wave.timeD - wave.time1) + wave.timeD
     wave.boxPriceEAnchor := wave.baNegative ? wave.priceD + math.min(wave.boxPriceEBot - wave.priceD, wave.boxPriceETop - wave.priceD) : wave.priceD + math.max(wave.boxPriceEBot - wave.priceD, wave.boxPriceETop - wave.priceD)
+    wave.boxPriceELabels := wave.baNegative ? wave.priceD + math.max(wave.boxPriceEBot - wave.priceD, wave.boxPriceETop - wave.priceD) : wave.priceD + math.min(wave.boxPriceEBot - wave.priceD, wave.boxPriceETop - wave.priceD)
     wave.barWidthInPixels := math.abs(bar_index - bar_index[1])
     // log.info(str.format("{0, number, #.##}", wave.retracement) + "% retracement, nWave is " + str.tostring(wave.nWave) + ", pWave is " + str.tostring(wave.pWave) + ", sWave is " + str.tostring(wave.sWave))
     drawIndicator(wave)

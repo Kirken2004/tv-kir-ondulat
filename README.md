@@ -87,14 +87,20 @@ The indicator is helpful at the time it is drawn until the candles gets into the
 
 The **E arrow** is what the market would have done if not stopped at B. But delayed by the BC time. 
 
-The **NT arrow** is almost the opposite, it's what the market would have done at the Target Time if the pressure had been the same between A and C. If C is lower than A, that differential is computed again. 
+The **NT arrow** is the AC differential from C. This arrow appear within an **N-Wave**. And need 33% of BC retracement to become relevant. 
 
-The **V arrow** is what the market would have done if the sign of BC had been reversed. 
+The **P arrow** is the AC differential from B. This arrow appear within an **N-Wave** in place of an **NT arrow** when BC retracement is above 50%.
 
-The indicator loses some of its relevance when the **Retracement BC** is lower than 33%.
+The **V arrow** is what the market would do to return to B. 
+
+The **S arrow** is displayed within a **Y-Wave** configuration. Meaning the market is en route for an expanding A/B/C/D. Higher highs and lower lows. As D is not realised yet, the indicator assumes the presence of an **S arrow** when BC retracement is above 100%. **Y arrow** and **Sm arrow** are also displayed. 
+
+The indicator loses some of its relevance when the **Retracement BC** is lower than 33% (are we in a range ?).
 Above that, arrows **N, V, E** and **NT** can still reveal potential targets.
 
 When the market is strongly bullish or bearish, it's not unusual to watch the price go crazy above or below the window. In such cases, the chart may follow a strength arrow that is a multiple of **E** or **N**. That's why this script has an option to display those multiples as new attractive targets. Take notes that 5E/5N are irrational targets.
+
+The **E-Box** is a potential timed window and a target area for the next wave after D. At the moment, the feature is unstable. It won't work well within a **P-Wave**. You need to place a **Point D** situated in time after **Point C**. Just move the point before or after to toggle this feature (if enabled in the settings).
 
 The **SLP** stands for **Straight Linear Projection**. It's really just the direction the chart is heading into from the C point to now (now being the last confirmed bar). It has no real value. The calculated value shown in the purple label is the market price this chart would end up at if continuing in that direction, up to the **Target Time**.
 
@@ -106,7 +112,7 @@ At the moment, this indicator is tedious to use on several charts at once :
     - You may require one layout(tab) per chart. 
     - Switching between symbols is not working. 
     - I wish i could draw several instances of this indicator on one chart without any trouble. 
-    - Dont check every option at once, you'll lose elements past 50 ones on the chart per indicator. 
+    - Dont check every option at once, you'll lose elements past 100 ones on the chart per indicator. 
 I'm pretty sure you'll find a comfy way to use it anyhow. 
 
 
@@ -122,7 +128,7 @@ I did, and it lasted 24 hours, after which a moderator kicked me for breaching t
 
     What made you choose the N Wave as a subject for this exercise ?
 
-I watched a presentation on Twitch about the undulatory theory of Hosoda. The streamer used a private indicator, apparently very simple but behind a paywall or something restricting. I found that weird as the indicator is so simple to reverse engineer. So i did. I may have stolen the color grading since i followed a screenshot of the stream. This streamer also had other options and more variant of the tool in his arsenal. I'm way out of my league and i'm not inclined to copycat everything he does. But that's inspiring. 
+I watched a presentation on Twitch about the undulatory theory of Hosoda. The streamer (ZSTrader) used a private indicator, apparently very simple but behind a paywall or something restricting. I found that weird as the indicator is so simple to reverse engineer. So i did. I may have stolen the color grading since i followed a screenshot of the stream. This streamer also had other options and more variants of the tool in his arsenal. I'm way out of my league and i'm not inclined to copycat everything he does. But that's inspiring. 
 
     Are you going to update this indicator in the future ? Or make new ones ?
 
@@ -145,7 +151,7 @@ No. Probably not. I'll get bored very quickly on that subject.
 
         - Trading Ichimoku Kinko Hyo Three Roles With Wave, Price, & Time Theories [https://www.youtube.com/watch?v=CIjWEsr0Cgo]
 
-    - ZS Trader's Masterclasses (French)
+    - ZSTrader's Masterclasses (French)
 
         - On youtube [https://www.youtube.com/@cryptologik-live/videos]
         - On twitch on tuesdays [https://www.twitch.tv/cryptologikfr]
