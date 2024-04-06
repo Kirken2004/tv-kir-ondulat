@@ -2,16 +2,22 @@ VERSION HISTORY
 
     v0.9.4 - 03-24-2024
 
-        - added P Target as B + (A - C), instead of an Nt one, displayed when having a P Wave structure using A/B/C/D
-        - added a window for a point E wave based on CLogik's approach using a potentially realised D point
+        - added the case of A/B/C is the beginning of an S-wave (more than 100% of BC retracement over AB)
+        - added P Target as B + (A - C), instead of an Nt one, displayed when having a P-wave structure using A/B/C/D (>50% retracement)
+        - added an option to specify the % of retracement needed for a P-wave (N-wave and P-wave have a blurry area)
+        - added a box to point E based on CLogik's approach using a potentially realised D point (many bugs if not in a positive N-Wave)
         - added an option to add the price to the label at each A/B/C/D point
-        - added timeframes to the Kihon Suchi series
+        - added vertical extended lines to the Kihon Suchi series
+            o can start from the last tenkan crossover/crossunder time (as period 1 in the series)
+            o can start from B time (as period 1 in the series)
         - added an option to draw the A/B/C/D trendlines (D has to be visible)
         - added an option to draw the A+26 periods dateline (and the C+26 one)
         - found a gremlin who messed with the calculus of the multiples of N and E arrows
-        - fixed an oopsie on the Tenkan Crossover limiting amount of labels and reduced the default max amount
-        - fixed the number of bars between A and B and C (the number in the above the bar label was not including A in the count)
-        - fixes and typos
+        - fixed an oopsie on the Tenkan Crossover limiting amount of labels 
+        - fixed the limitation of the total amount of labels displayed by the indicator to 100
+        - fixed the number of bars between A and B and C (the number in the "above the bar" label was not including A in the count)
+        - fixes and many typos
+        - removed dead code
 
     v0.9.3 - 03-23-2024
 

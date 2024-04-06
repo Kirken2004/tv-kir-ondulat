@@ -42,7 +42,8 @@ tcol = input.color(defval=color.green, title=" ", inline="option6", group="Wave 
 twid = input.int(defval=2, title="Width", inline="option6", group="Wave options")
 
 ichi = input.bool(defval=false, title="Ichimoku Kinko Hyo", inline="option1", group="Ichimoku options")
-crss = input.bool(defval=false, title="Tenkan Crossover/under markers", inline="option2", group="Ichimoku options")
+crss = input.bool(defval=false, title="Tenkan Crossover/under markers.", inline="option2", group="Ichimoku options")
+maxl = input.int(10, minval=1, title=" up to", inline="option2", group="Ichimoku options", tooltip = "An indicator is limited in the allowed amount of labels to draw. Keep this value low enough to prevent having lost labels.")
 
 ksmx = input.int(defval=42, title="Max period", inline="option1", group="Kihon Suchi options", tooltip = "Won't draw Ichimoku times after this elapsed period")
 kisu = input.bool(defval=false, title="from last Crossover", inline="option1", group="Kihon Suchi options", tooltip = "Need Tenkan crossovers to be displayed to add predictions")
@@ -116,7 +117,6 @@ conversionPeriods = input.int(9, minval=1, title="Conversion Line Length", group
 basePeriods = input.int(26, minval=1, title="Base Line Length", group="Ichimoku")
 laggingSpan2Periods = input.int(52, minval=1, title="Leading Span B Length", group="Ichimoku")
 displacement = input.int(26, minval=1, title="Lagging Span", group="Ichimoku")
-MaxLabels = input.int(7, minval=1, title="Maximum Crossover Labels", group="Ichimoku", tooltip = "An indicator is limited in the allowed amount of labels to draw. Keep this value low enough to prevent having lost labels.")
 conversionLine = donchian(conversionPeriods)
 baseLine = donchian(basePeriods)
 leadLine1 = math.avg(conversionLine, baseLine)
@@ -146,20 +146,6 @@ src = input(close, title="Source", group="Exponential Moving Average")
 offset = input.int(title="Offset", defval=0, minval=-500, maxval=500, display = display.data_window, group="Exponential Moving Average")
 typeMA = input.string(title = "Method", defval = "SMA", options=["SMA", "EMA", "SMMA (RMA)", "WMA", "VWMA"], group="Exponential Moving Average", display = display.data_window)
 smoothingLength = input.int(title = "Length", defval = 5, minval = 1, maxval = 100, group="Exponential Moving Average", display = display.data_window)
-
-// ma(source, length, type) =>
-//     switch type
-//         "SMA" => ta.sma(source, length)
-//         "EMA" => ta.ema(source, length)
-//         "SMMA (RMA)" => ta.rma(source, length)
-//         "WMA" => ta.wma(source, length)
-//         "VWMA" => ta.vwma(source, length)
-
-_barForTime(_t) =>
-    var int _bar = na
-    if time_close[1] <= _t and time >= _t
-        _bar := bar_index
-    _bar
 
 int nb_seconds = timeframe.in_seconds(timeframe.period)
 int candleTime = nb_seconds * 1000
@@ -700,7 +686,7 @@ if crss and barstate.islastconfirmedhistory
         int v = array.get(crossoverBars, i)
         int d = array.get(crossoverDist, i)
         labelCount := labelCount + 1
-        if labelCount <= MaxLabels
+        if labelCount <= maxl
             if i == array.size(crossoverBars) - 1
                 label.new(v, na, "⬅ " + str.format("{0, number, ###}", d) + "\n→" + str.format("{0, number, ###}", 1 + bar_index - lastCrossover), xloc.bar_index, yloc.abovebar, color.rgb(255, 0, 0), label.style_arrowdown, color.rgb(117, 188, 255), size.normal)
             else    
