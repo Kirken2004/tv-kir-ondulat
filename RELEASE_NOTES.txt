@@ -1,5 +1,26 @@
 VERSION HISTORY
 
+    v0.9.4 - 04-06-2024
+
+        - added the case of A/B/C is the beginning of an S-Wave (more than 100% of BC retracement over AB)
+        - added P Target as B + (A - C), instead of an Nt one, displayed when having a P-Wave structure using A/B/C/D (>50% retracement)
+        - added an option to specify the % of retracement needed for a P-Wave (N-Wave and P-Wave have a blurry area)
+        - added a box to point E based on CLogik's approach using a potentially realised D point : 
+            o still has many bugs if not in a positive N-Wave,
+            o and it won't display anything within an S-Wave
+        - added an option to add the price to the label at each A/B/C/D point
+        - added vertical extended lines to the Kihon Suchi series that : 
+            o can start from the last tenkan crossover/crossunder time (as period 1 in the series)
+            o can start from B time (as period 1 in the series)
+        - added an option to draw the A/B/C/D trendlines (D has to be visible)
+        - added an option to draw the A+26 periods dateline (and the C+26 one)
+        - found a gremlin who messed with the calculus of the multiples of N and E arrows
+        - fixed an oopsie on the Tenkan Crossover limiting amount of labels 
+        - fixed the limitation of the total amount of labels displayed by the indicator to 100
+        - fixed the number of bars between A and B and C (the number in the "above the bar" label was not including A in the count)
+        - fixes and many typos
+        - removed dead code
+
     v0.9.3 - 03-23-2024
 
         - fixes and typos
@@ -7,7 +28,7 @@ VERSION HISTORY
     v0.9.2 - 03-19-2024
 
         - changed the SLP arrow to a realtime direction arrow ending up on TARGET TIME
-        - SLP arrow disappear past the TARGET TIME
+        - SLP arrow now disappears past the TARGET TIME
         - removed the VERSION.txt file that was only used internally
         - Added a hint option for people in need of the Kihon Suchi cycles
         - Added the built-in Ichimoku indicator as an integrated option
