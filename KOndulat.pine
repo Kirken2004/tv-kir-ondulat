@@ -1,5 +1,5 @@
 //@version=5
-indicator("Kir Ondulatoire", shorttitle="KOndulat", overlay=true)
+indicator("Kir Ondulatoire", shorttitle="KOndulat", overlay=true, max_labels_count = 100)
 
     // version 0.9.4
 
@@ -36,9 +36,10 @@ mult = input.bool(defval=false, title="Multiples of E/N waves", inline="option2"
 ebox = input.bool(defval=false, title="E-Box", inline="option3", group="Wave options", tooltip="Need the point D to be placed after time C")
 ecol = input.color(defval=color.aqua, title=" ", inline="option3", group="Wave options")
 tend = input.bool(defval=false, title="Straight Linear Projection", inline="option4", group="Wave options", tooltip="As long as the TARGET TIME is not reached, a purple arrow will point to the target. A purple label will give the estimated target price. It's a silly feature.")
-labp = input.bool(defval=false, title="Prices in labels", inline="option5", group="Wave options")
+labp = input.bool(defval=false, title="Price in labels", inline="option5", group="Wave options")
 tren = input.bool(defval=false, title="Wave Trend Lines", inline="option6", group="Wave options", tooltip = "Only visibles if D label is also visible. Help to visually confirm if ABCD is an N/Y/P wave.")
 tcol = input.color(defval=color.green, title=" ", inline="option6", group="Wave options")
+twid = input.int(defval=2, title="Width", inline="option6", group="Wave options")
 
 ichi = input.bool(defval=false, title="Ichimoku Kinko Hyo", inline="option1", group="Ichimoku options")
 crss = input.bool(defval=false, title="Tenkan Crossover/under markers", inline="option2", group="Ichimoku options")
@@ -160,7 +161,8 @@ _barForTime(_t) =>
         _bar := bar_index
     _bar
 
-nb_seconds = timeframe.in_seconds(timeframe.period)
+int nb_seconds = timeframe.in_seconds(timeframe.period)
+int candleTime = nb_seconds * 1000
 
 var labelRetracementBC = label.new(x=na, y=na, text="Retracement BC: na", color=color.rgb(70, 3, 81, 45), textcolor=color.rgb(255, 255, 255), style=label.style_label_up, xloc=xloc.bar_time)
 
@@ -255,8 +257,9 @@ drawIndicator(Wave t) =>
         line.new(t.boxTime0, t.boxSmPrice, t.boxTime1, t.boxSmPrice, xloc = xloc.bar_time, color = t.arrowColorVSm, width=1, style=line.style_dotted)                                                                                    // level Sm
 
     if ac26
-        int time1plus26 = t.time1 + (26 * nb_seconds * 1000)
-        int time3plus26 = t.time3 + (26 * nb_seconds * 1000)
+        int candleTime25x = 25 * candleTime
+        int time1plus26 = t.time1 + candleTime25x
+        int time3plus26 = t.time3 + candleTime25x
         float highest = math.max(t.price1, t.price2, t.price3, t.priceD, t.boxTopPrice)
         float lowest = math.min(t.price1, t.price2, t.price3, t.priceD, t.boxTopPrice)
         line.new(time1plus26, highest, time1plus26, lowest, xloc = xloc.bar_time, color = color.orange, width=1, style=line.style_dotted)                                                                                             // time A + 26 periods
@@ -280,7 +283,7 @@ drawIndicator(Wave t) =>
         line.new(t.boxTime0, t.boxTopPrice5 - (t.boxTopPrice - t.price4), t.boxTime1, t.boxTopPrice5 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = t.arrowColorNS, width=1, style=line.style_dotted)                       // level 5N
         line.new(t.boxTime0, t.boxTopPrice5, t.boxTime1, t.boxTopPrice5, xloc = xloc.bar_time, color = t.arrowColorEY, width=1, style=line.style_dotted)                                                                                 // level 5E
 
-    line.new(t.time3 + t.timeDelta2 - nb_seconds, t.price3, t.time3 + t.timeDelta2 - nb_seconds, t.boxTopPrice, xloc = xloc.bar_time, color = t.arrowColorVSm, width=1, style=line.style_dashed)                                         // dashed at double correction time
+    line.new(t.time3 + t.timeDelta2, t.price3, t.time3 + t.timeDelta2, t.boxTopPrice, xloc = xloc.bar_time, color = t.arrowColorVSm, width=1, style=line.style_dashed)                                                                   // dashed at double correction time
 
     box.new(t.boxTime0, t.boxTopPrice, t.boxTime1, t.price3, border_color = color.teal, border_width = 1, border_style = line.style_solid, bgcolor = na, xloc=xloc.bar_time)                                                           // target box deadline
     line.new(t.time3 + t.timeDelta1, t.boxTopPrice, t.time3 + t.timeDelta1, t.price3, xloc=xloc.bar_time, style = line.style_dashed, width = 1, color=color.teal)                                                                      // target dashed dateline
@@ -346,94 +349,94 @@ drawIndicator(Wave t) =>
         labelTargetPriceE.set_x(t.boxTime1)
         labelTargetPriceE.set_y(t.boxTopPrice)
         labelTargetPriceE.set_yloc(yloc.price)
-        labelTargetPriceE.set_text("E=" + str.format("{0, number, #.##}", t.boxTopPrice))
+        labelTargetPriceE.set_text("E=" + str.format("{0, number, #.####}", t.boxTopPrice))
 
         labelTargetPriceN.set_x(t.boxTime1)
         labelTargetPriceN.set_y(t.price4)
         labelTargetPriceN.set_yloc(yloc.price)
-        labelTargetPriceN.set_text("N=" + str.format("{0, number, #.##}", t.price4))
+        labelTargetPriceN.set_text("N=" + str.format("{0, number, #.####}", t.price4))
 
         labelTargetPriceV.set_x(t.boxTime1)
         labelTargetPriceV.set_y(t.boxVPrice)
         labelTargetPriceV.set_yloc(yloc.price)
-        labelTargetPriceV.set_text("V=" + str.format("{0, number, #.##}", t.boxVPrice))
+        labelTargetPriceV.set_text("V=" + str.format("{0, number, #.####}", t.boxVPrice))
 
     if t.pWave == false and t.sWave == false
         labelTargetPriceNt.set_x(t.boxTime1)
         labelTargetPriceNt.set_y(t.boxNtPrice)
         labelTargetPriceNt.set_yloc(yloc.price)
-        labelTargetPriceNt.set_text("NT=" + str.format("{0, number, #.##}", t.boxNtPrice))
+        labelTargetPriceNt.set_text("NT=" + str.format("{0, number, #.####}", t.boxNtPrice))
 
     if t.pWave
         labelTargetPriceP.set_x(t.boxTime1)
         labelTargetPriceP.set_y(t.boxPPrice)
         labelTargetPriceP.set_yloc(yloc.price)
-        labelTargetPriceP.set_text("P=" + str.format("{0, number, #.##}", t.boxPPrice))
+        labelTargetPriceP.set_text("P=" + str.format("{0, number, #.####}", t.boxPPrice))
 
     if t.sWave
         labelTargetPriceY.set_x(t.boxTime1)
         labelTargetPriceY.set_y(t.boxYPrice)
         labelTargetPriceY.set_yloc(yloc.price)
-        labelTargetPriceY.set_text("Y=" + str.format("{0, number, #.##}", t.boxYPrice))
+        labelTargetPriceY.set_text("Y=" + str.format("{0, number, #.####}", t.boxYPrice))
 
         labelTargetPriceS.set_x(t.boxTime1)
         labelTargetPriceS.set_y(t.boxSPrice)
         labelTargetPriceS.set_yloc(yloc.price)
-        labelTargetPriceS.set_text("S=" + str.format("{0, number, #.##}", t.boxSPrice))
+        labelTargetPriceS.set_text("S=" + str.format("{0, number, #.####}", t.boxSPrice))
 
         labelTargetPriceSm.set_x(t.boxTime1)
         labelTargetPriceSm.set_y(t.boxSmPrice)
         labelTargetPriceSm.set_yloc(yloc.price)
-        labelTargetPriceSm.set_text("Sm=" + str.format("{0, number, #.##}", t.boxSmPrice))
+        labelTargetPriceSm.set_text("Sm=" + str.format("{0, number, #.####}", t.boxSmPrice))
         
     if mult and t.sWave == false
         labelTargetPrice2E.set_x(t.boxTime1)
         labelTargetPrice2E.set_y(t.boxTopPrice2)
         labelTargetPrice2E.set_yloc(yloc.price)
-        labelTargetPrice2E.set_text("2E=" + str.format("{0, number, #.##}", t.boxTopPrice2))
+        labelTargetPrice2E.set_text("2E=" + str.format("{0, number, #.####}", t.boxTopPrice2))
 
         labelTargetPrice2N.set_x(t.boxTime1)
         labelTargetPrice2N.set_y(t.boxTopPrice2 - (t.boxTopPrice - t.price4))
         labelTargetPrice2N.set_yloc(yloc.price)
-        labelTargetPrice2N.set_text("2N=" + str.format("{0, number, #.##}", t.boxTopPrice2 - (t.boxTopPrice - t.price4)))
+        labelTargetPrice2N.set_text("2N=" + str.format("{0, number, #.####}", t.boxTopPrice2 - (t.boxTopPrice - t.price4)))
 
         labelTargetPrice3E.set_x(t.boxTime1)
         labelTargetPrice3E.set_y(t.boxTopPrice3)
         labelTargetPrice3E.set_yloc(yloc.price)
-        labelTargetPrice3E.set_text("3E=" + str.format("{0, number, #.##}", t.boxTopPrice3))
+        labelTargetPrice3E.set_text("3E=" + str.format("{0, number, #.####}", t.boxTopPrice3))
 
         labelTargetPrice3N.set_x(t.boxTime1)
         labelTargetPrice3N.set_y(t.boxTopPrice3 - (t.boxTopPrice - t.price4))
         labelTargetPrice3N.set_yloc(yloc.price)
-        labelTargetPrice3N.set_text("3N=" + str.format("{0, number, #.##}", t.boxTopPrice3 - (t.boxTopPrice - t.price4)))
+        labelTargetPrice3N.set_text("3N=" + str.format("{0, number, #.####}", t.boxTopPrice3 - (t.boxTopPrice - t.price4)))
 
         labelTargetPrice4E.set_x(t.boxTime1)
         labelTargetPrice4E.set_y(t.boxTopPrice4)
         labelTargetPrice4E.set_yloc(yloc.price)
-        labelTargetPrice4E.set_text("4E=" + str.format("{0, number, #.##}", t.boxTopPrice4))
+        labelTargetPrice4E.set_text("4E=" + str.format("{0, number, #.####}", t.boxTopPrice4))
 
         labelTargetPrice4N.set_x(t.boxTime1)
         labelTargetPrice4N.set_y(t.boxTopPrice4 - (t.boxTopPrice - t.price4))
         labelTargetPrice4N.set_yloc(yloc.price)
-        labelTargetPrice4N.set_text("4N=" + str.format("{0, number, #.##}", t.boxTopPrice4 - (t.boxTopPrice - t.price4)))
+        labelTargetPrice4N.set_text("4N=" + str.format("{0, number, #.####}", t.boxTopPrice4 - (t.boxTopPrice - t.price4)))
         
         labelTargetPrice5E.set_x(t.boxTime1)
         labelTargetPrice5E.set_y(t.boxTopPrice5)
         labelTargetPrice5E.set_yloc(yloc.price)
-        labelTargetPrice5E.set_text("5E=" + str.format("{0, number, #.##}", t.boxTopPrice5))
+        labelTargetPrice5E.set_text("5E=" + str.format("{0, number, #.####}", t.boxTopPrice5))
 
         labelTargetPrice5N.set_x(t.boxTime1)
         labelTargetPrice5N.set_y(t.boxTopPrice5 - (t.boxTopPrice - t.price4))
         labelTargetPrice5N.set_yloc(yloc.price)
-        labelTargetPrice5N.set_text("5N=" + str.format("{0, number, #.##}", t.boxTopPrice5 - (t.boxTopPrice - t.price4)))
+        labelTargetPrice5N.set_text("5N=" + str.format("{0, number, #.####}", t.boxTopPrice5 - (t.boxTopPrice - t.price4)))
 
     // Point D is only labeled if positionned after Time C
     if t.timeD > t.time3
-        label.new(t.timeD, t.priceD, "D\n" + str.format("{0, number, ###}", 1 + ((t.timeD - t.time1) / nb_seconds / 1000)) + (labp ? "\n" + str.format("{0, number, #.##}", t.priceD) : ""), xloc.bar_time, yloc.price, pointFillColor, styleABC2, pointTextColor, size.small, text.align_center)
+        label.new(t.timeD, t.priceD, "D\n" + str.format("{0, number, ###}", 1 + ((t.timeD - t.time1) / nb_seconds / 1000)) + (labp ? "\n" + str.format("{0, number, #.####}", t.priceD) : ""), xloc.bar_time, yloc.price, pointFillColor, styleABC2, pointTextColor, size.small, text.align_center)
         // Trendlines are drawable since D is visible
         if tren
-            line.new(t.time1, t.price1, t.time3, t.price3, xloc=xloc.bar_time, color=tcol, style = line.style_solid, width=1, extend = extend.both)
-            line.new(t.time2, t.price2, t.timeD, t.priceD, xloc=xloc.bar_time, color=tcol, style = line.style_solid, width=1, extend = extend.both)
+            line.new(t.time1, t.price1, t.time3, t.price3, xloc=xloc.bar_time, color=tcol, style = line.style_solid, width=twid, extend = extend.both)
+            line.new(t.time2, t.price2, t.timeD, t.priceD, xloc=xloc.bar_time, color=tcol, style = line.style_solid, width=twid, extend = extend.both)
 
     // E-Box: If Point D has been placed after Point C, we have some prediction to make
     if ebox and t.timeD > t.time3
@@ -443,11 +446,11 @@ drawIndicator(Wave t) =>
         labelTargetPriceETop.set_x(t.boxTimeE1)
         labelTargetPriceETop.set_y(t.boxPriceETop)
         labelTargetPriceETop.set_yloc(yloc.price)
-        labelTargetPriceETop.set_text(str.format("{0, number, #.##}", t.boxPriceETop))        
+        labelTargetPriceETop.set_text(str.format("{0, number, #.####}", t.boxPriceETop))        
         labelTargetPriceEBot.set_x(t.boxTimeE1)
         labelTargetPriceEBot.set_y(t.boxPriceEBot)
         labelTargetPriceEBot.set_yloc(yloc.price)
-        labelTargetPriceEBot.set_text(str.format("{0, number, #.##}", t.boxPriceEBot))
+        labelTargetPriceEBot.set_text(str.format("{0, number, #.####}", t.boxPriceEBot))
         labelBeforeTargetETime.set_x(t.boxTimeE0)
         labelBeforeTargetETime.set_y(t.boxPriceEBot)
         labelBeforeTargetETime.set_yloc(yloc.price)
@@ -461,18 +464,19 @@ drawIndicator(Wave t) =>
             labelAfterTargetETime.set_style(label.style_label_down)
 
     if ksob and kisu == false
-        int pointB = t.time2 - (nb_seconds * 1000)
-        int[] cycles = array.from(9,17,26,33,42,51,65,76,83,97,101,151,226)
+        int pointB = t.time2 - candleTime
+        int[] cycles = array.from(0,9,17,26,33,42,51,65,76,83,97,101,151,226)
         for i = array.size(cycles) - 1 to 0
             if array.get(cycles, i) <= ksmx 
-                cycle = (array.get(cycles, i) * nb_seconds * 1000) + pointB
-                line.new(cycle, math.min(y1Input, y2Input, y3Input), cycle, math.max(y1Input, y2Input, y3Input), xloc.bar_time, extend.both, color.blue, line.style_solid, 2)
+                cycle = (array.get(cycles, i) * candleTime) + pointB
+                if i > 0
+                    line.new(cycle, math.min(y1Input, y2Input, y3Input), cycle, math.max(y1Input, y2Input, y3Input), xloc.bar_time, extend.both, color.rgb(33, 149, 243, 50), line.style_dotted, 2)
                 label.new(cycle, t.price2, str.format("{0, number, ##}", array.get(cycles, i)), xloc.bar_time, yloc.price, color.rgb(27, 32, 36, 100), label.style_label_left, color.blue )
 
     if fibo
-        var offsetXFiboM = (nb_seconds * 1000 * fiboBarOffset) + t.time2
-        var offsetXFiboL = offsetXFiboM - (nb_seconds * 1000 * fiboBarWidth)
-        var offsetXFiboR = offsetXFiboM + (nb_seconds * 1000 * fiboBarWidth)
+        var offsetXFiboM = (candleTime * fiboBarOffset) + t.time2
+        var offsetXFiboL = offsetXFiboM - (candleTime * fiboBarWidth)
+        var offsetXFiboR = offsetXFiboM + (candleTime * fiboBarWidth)
         var fiboScaleColor = color.rgb(31, 205, 187)
         var fiboAxisColor = color.rgb(92, 234, 220)
         var fiboZeroColor = color.rgb(31, 205, 187, 42)
@@ -565,7 +569,7 @@ drawSLP(Wave t) =>
     if tend and t.time4 > t.currentTime
         var nBarOvershoot = 5
         var predi = t.price3 + ((t.currentPrice - t.price3)*(t.time4 - t.time3))/(t.currentTime - t.time3)
-        var timeAtOvershoot = t.time4 //t.currentTime + (nBarOvershoot * nb_seconds * 1000)
+        var timeAtOvershoot = t.time4 //t.currentTime + (nBarOvershoot * candleTime)
         var slpPrice = t.price3 + ((t.currentPrice - t.price3)*(timeAtOvershoot - t.time3))/(t.currentTime - t.time3)
 
         label.new(t.currentTime, na, "SLP=" + formatPrice(predi), xloc.bar_time, yloc.abovebar, color.rgb(132, 0, 255), label.style_label_lower_left, size=size.small, textcolor = color.rgb(255, 255, 255), textalign = text.align_center)
@@ -663,19 +667,33 @@ if barstate.islast
 
 // Ichimoku stuff
 plot(ichi ? conversionLine : na, color=#4385ff, title="Tekan Conversion Line")                                        // TENKAN SEN
-plot(ichi ? baseLine : na, color=#f83737, title="Kijun Reference Line")                                                    // KIJUN SEN
+plot(ichi ? baseLine : na, color=#f83737, title="Kijun Base Line")                                                    // KIJUN SEN
 plot(ichi ? close : na, offset = -displacement + 1, color=#43A047, title="Lagging Chikou Span")
 p1 = plot(ichi ? leadLine1 : na, offset = displacement - 1, color=#A5D6A7, title="Leading Senkou Span A")
 p2 = plot(ichi ? leadLine2 : na, offset = displacement - 1, color=#EF9A9A, title="Leading Senkou Span B")
 //plot(ichi ? (leadLine1 > leadLine2 ? leadLine1 : leadLine2) : na, offset = displacement - 1, title = "Kumo Cloud Upper Line", color = #7eff83, display = display.none)
 //plot(ichi ? (leadLine1 < leadLine2 ? leadLine1 : leadLine2) : na, offset = displacement - 1, title = "Kumo Cloud Lower Line", color = #ff6464, display = display.none)
 fill(p1, p2, color = leadLine1 > leadLine2 ? color.rgb(67, 160, 71, 90) : color.rgb(244, 67, 54, 90))
+plot((ichi and crss) ? (ta.crossover(conversionLine,baseLine) ? baseLine : na) : na,'Crossover',#2157f3,3,plot.style_circles)
+plot((ichi and crss) ? (ta.crossunder(conversionLine,baseLine) ? baseLine : na) : na,'Crossunder',#ff5d00,3,plot.style_circles)
 
 // Display of the Tenkan Crossover Gaps
 if crss and barstate.islastconfirmedhistory
 
     lastCrossover = array.get(crossoverBars, array.size(crossoverBars) - 1)
     lastCrossoverDist = array.get(crossoverDist, array.size(crossoverBars) - 1)
+
+    // Kihon Suchi Cycles
+    if kisu and ksob == false
+        int[] cycles = array.from(0,9,17,26,33,42,51,65,76,83,97,101,151,226)
+        for i = array.size(cycles) - 1 to 0
+            if array.get(cycles, i) <= ksmx 
+                cycle = array.get(cycles, i) + lastCrossBar
+                if i > 0
+                    line.new(cycle, math.min(y1Input, y2Input, y3Input), cycle, math.max(y1Input, y2Input, y3Input), xloc.bar_index, extend.both, color.yellow, line.style_dotted, 1)
+                label.new(cycle, y2Input, str.format("{0, number, ##}", array.get(cycles, i)), xloc.bar_index, yloc.price, color.rgb(27, 32, 36, 100), label.style_label_left, color.yellow )
+        line.new(lastCrossover + lastCrossoverDist, math.min(y1Input, y2Input, y3Input), lastCrossover + lastCrossoverDist, math.max(y1Input, y2Input, y3Input), xloc.bar_index, extend.both, color.rgb(255, 217, 0), line.style_dashed, 1)
+        label.new(lastCrossover + lastCrossoverDist, y2Input, str.format("{0, number, ##}", lastCrossoverDist), xloc.bar_index, yloc.price, color.rgb(128, 128, 128, 80), label.style_label_up, color.yellow )
 
     // Print the list of crossover bars and distances
     for i = array.size(crossoverBars) - 1 to 0
@@ -687,15 +705,6 @@ if crss and barstate.islastconfirmedhistory
                 label.new(v, na, "⬅ " + str.format("{0, number, ###}", d) + "\n→" + str.format("{0, number, ###}", 1 + bar_index - lastCrossover), xloc.bar_index, yloc.abovebar, color.rgb(255, 0, 0), label.style_arrowdown, color.rgb(117, 188, 255), size.normal)
             else    
                 label.new(v, na, "⬅ " + str.format("{0, number, ###}", d), xloc.bar_index, yloc.abovebar, color.rgb(255, 0, 0), label.style_arrowdown, color.rgb(117, 188, 255), size.normal)
-
-    // Kihon Suchi Cycles
-    if kisu and ksob == false
-        int[] cycles = array.from(9,17,26,33,42,51,65,76,83,97,101,151,226)
-        for i = array.size(cycles) - 1 to 0
-            if array.get(cycles, i) <= ksmx 
-                cycle = array.get(cycles, i) + lastCrossBar
-                line.new(cycle, math.min(y1Input, y2Input, y3Input), cycle, math.max(y1Input, y2Input, y3Input), xloc.bar_index, extend.none, color.yellow, line.style_dotted, 1)
-        line.new(lastCrossover + lastCrossoverDist, math.min(y1Input, y2Input, y3Input), lastCrossover + lastCrossoverDist, math.max(y1Input, y2Input, y3Input), xloc.bar_index, extend.none, color.rgb(255, 217, 0), line.style_dashed, 1)
 
 // EMA
 out = ta.ema(src, len)
