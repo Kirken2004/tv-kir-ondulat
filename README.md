@@ -78,11 +78,12 @@ If BC is atleast 33% of AB, it's fair to assume the price is going to turn in th
 The **N arrow** is merely AB drawn again from C. 
 That hypothetical D pointed by the N arrow is at the **Target Time** (sometimes called the **N time**, or even **N Target**).
 
-The **Target Time** is in a window in which the value is not supposed to be drastically changing, once the current bar gets inside. The duration of the window is inferred by the BC duration. The right side of the window is usually predicting the end of a structure, and a period where a new one is building up.
+The **Target Time** is in a window, a box, in which the value is supposed to evolve or solidify the current structure move. The left side of the box is time 1, and the middle dashed line is the time 2. Once the current bar gets inside, you know the time component of the action. Yet you'll have to discover the price it goes to. The duration of the window is inferred by the BC duration. The right side of the window (time 3) is usually the beginning of a new wave building up, or a continuation you had to confirm.
 
-A reddish dashed line named the **Decision Line** is drawn away from BC, at the same distance from C. This dashed line is at a moment in time when you may want to check the rightness of the predictions. If the candles follow the arrows and dont change direction before this stage, the window is still a potential target for the N Wave. If the candles went completly elsewhere, you probably misplaced your ABC points. Or the market just went crazy, like it often does (sic).
+A reddish dashed line named the **Correlation Line** is drawn away from BC, at the same distance from C. This dashed line is at a moment in time when you may want to check the rightness of the predictions. If the candles follow the arrows and dont change direction before this stage, the window is still a potential target for the N Wave. If the candles went completly elsewhere, you probably misplaced your ABC points. Or the market just went crazy, like it often does (sic). 
+If the line is before or after time 2 by one period, you may determine a correlation with the Ichimoku numbers (ie. Kihon Suchi series).
 
-The indicator is helpful at the time it is drawn until the candles gets into the window. It wont move over time. Whatever the market is doing, once on the other side of the **decision line**, this instance of the indicator becomes a thing of the past. If you made a plan using it, stick to the plan. And play it safe if the market tries something unexpected in that window. 
+The indicator is helpful at the time it is drawn until the candles gets into the window. It wont move over time. Whatever the market is doing, once on the other side of the **Correlation Line**, this instance of the indicator becomes a thing of the past. If you made a plan using it, stick to the plan. And play it safe if the market tries something unexpected in that window. 
 
 The **E arrow** is what the market would have done if not stopped at B. But delayed by the BC time. 
 
@@ -101,7 +102,12 @@ I also added a feature called **Tenkan Crossover Markers**. An arrow is displaye
 
 The **Kihon Suchi** series describe a typical number of bars after which the Tenkan sen crosses over the Kijun sen. It's theory. And prone to errors by 2 due to the nature of bars in a timeframe. After the last crossing, one can expect to see the next one following that series. I added this indicator for fun. The dashed gold line is not on the series. It shows the bar in the future that correspond to the same cycle than the last one. The numbers of the series can be displayed at the bottom center of the chart. 
 
-At the moment, this indicator is tedious to use on several charts at once. You may require one layout(tab) per chart. Switching between symbols is not working. I wish i could draw several instances of this indicator on one chart. I'm pretty sure you'll find a comfy way to use it anyhow. 
+At the moment, this indicator is tedious to use on several charts at once : 
+    - You may require one layout(tab) per chart. 
+    - Switching between symbols is not working. 
+    - I wish i could draw several instances of this indicator on one chart without any trouble. 
+    - Dont check every option at once, you'll lose elements past 50 ones on the chart per indicator. 
+I'm pretty sure you'll find a comfy way to use it anyhow. 
 
 
 ## F.A.Q.
@@ -151,6 +157,13 @@ No. Probably not. I'll get bored very quickly on that subject.
         - Fibonacci retracement [https://en.wikipedia.org/wiki/Fibonacci_retracement]
         - Ichimoku Kinkō Hyō [https://en.wikipedia.org/wiki/Ichimoku_Kink%C5%8D_Hy%C5%8D]
 
+    - TradingView
+
+        - IKH Wave Theory Introduction and Indicator Basics [https://www.tradingview.com/chart/BTCUSD/NHqEe3Qk-Ichimoku-Kink%C5%8D-Hy%C5%8D-Wave-Theory-Introduction-and-Indicator-Basics/]
+
+    - XTB.com (French)
+
+        - Ichimoku: quel est cet indicateur ? [https://www.xtb.com/fr/formation/ichimoku]
 
 
 ## Contact

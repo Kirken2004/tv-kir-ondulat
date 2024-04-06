@@ -9,7 +9,7 @@ VERSION HISTORY
         - added an option to draw the A/B/C/D trendlines (D has to be visible)
         - added an option to draw the A+26 periods dateline (and the C+26 one)
         - found a gremlin who messed with the calculus of the multiples of N and E arrows
-        - fixed an oopsie on the Tenkan Crossover amount of labels limiter and reduced the default max amount
+        - fixed an oopsie on the Tenkan Crossover limiting amount of labels and reduced the default max amount
         - fixed the number of bars between A and B and C (the number in the above the bar label was not including A in the count)
         - fixes and typos
 
@@ -20,7 +20,7 @@ VERSION HISTORY
     v0.9.2 - 03-19-2024
 
         - changed the SLP arrow to a realtime direction arrow ending up on TARGET TIME
-        - SLP arrow disappear past the TARGET TIME
+        - SLP arrow now disappears past the TARGET TIME
         - removed the VERSION.txt file that was only used internally
         - Added a hint option for people in need of the Kihon Suchi cycles
         - Added the built-in Ichimoku indicator as an integrated option
