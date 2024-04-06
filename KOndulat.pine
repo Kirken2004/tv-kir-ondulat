@@ -33,7 +33,7 @@ y4Input = input.price(PRICE_DEFAULT, "",        inline = "4", tooltip = "Pick po
 
 pret = input.float(defval=50.0, title="% Retracement for a P-Wave", inline="option1", group="Wave options", tooltip="By default, a P wave is forming if the move BC retraced more than 50% of AB. N waves are more certain between 33% and 50%. Alter this if you think the situation is blurry.")
 mult = input.bool(defval=false, title="Multiples of E/N waves", inline="option2", group="Wave options", tooltip="Won't work in case of an S-Wave")
-ebox = input.bool(defval=false, title="E-Box", inline="option3", group="Wave options", tooltip="Need the point D to be placed after time C")
+ebox = input.bool(defval=true, title="E-Box", inline="option3", group="Wave options", tooltip="Need the point D to be placed after time C [STILL BUGGED AT THE MOMENT].")
 ecol = input.color(defval=color.aqua, title=" ", inline="option3", group="Wave options")
 tend = input.bool(defval=false, title="Straight Linear Projection", inline="option4", group="Wave options", tooltip="As long as the TARGET TIME is not reached, a purple arrow will point to the target. A purple label will give the estimated target price. It's a silly feature.")
 labp = input.bool(defval=false, title="Price in labels", inline="option5", group="Wave options")
@@ -97,6 +97,7 @@ type Wave
     float boxSmPrice
     float boxPriceETop
     float boxPriceEBot
+    float boxPriceEAnchor
     float currentPrice
     float midADPrice
     int   currentTime
@@ -427,8 +428,8 @@ drawIndicator(Wave t) =>
     // E-Box: If Point D has been placed after Point C, we have some prediction to make
     if ebox and t.timeD > t.time3
         box.new(t.boxTimeE0, t.boxPriceEBot, t.boxTimeE1, t.boxPriceETop, bgcolor = color.rgb(0,0,0,100), border_color = ecol, xloc = xloc.bar_time, border_width = 1)
-        line.new(t.timeD, t.priceD, t.boxTimeE0, t.boxPriceETop, xloc=xloc.bar_time, color=ecol, style = line.style_arrow_right, width=1)
-        line.new(t.timeD, t.priceD, t.boxTimeE1, t.boxPriceETop, xloc=xloc.bar_time, color=ecol, style = line.style_arrow_right, width=1)
+        line.new(t.timeD, t.priceD, t.boxTimeE0, t.boxPriceEAnchor, xloc=xloc.bar_time, color=ecol, style = line.style_arrow_right, width=1)
+        line.new(t.timeD, t.priceD, t.boxTimeE1, t.boxPriceEAnchor, xloc=xloc.bar_time, color=ecol, style = line.style_arrow_right, width=1)
         labelTargetPriceETop.set_x(t.boxTimeE1)
         labelTargetPriceETop.set_y(t.boxPriceETop)
         labelTargetPriceETop.set_yloc(yloc.price)
@@ -574,6 +575,28 @@ if barstate.isrealtime and not barstate.isconfirmed
     
     drawSLP(wave)
 
+closestLevel(bool baNegative, float d, float n, float e, float n2, float e2) => 
+    float level = 0
+    if baNegative == false
+        if d>n
+            level := d-n
+        if d>e
+            level := d-e
+        if d>n2
+            level := d-n2
+        if d>e2
+            level := d-e2
+    if baNegative
+        if d<n
+            level := n-d
+        if d<e
+            level := e-d
+        if d<n2
+            level := n2-d
+        if d<e2
+            level := e2-d
+    level
+
 // Draw the indicator on next confirmed tick
 if barstate.islastconfirmedhistory
 
@@ -617,33 +640,17 @@ if barstate.islastconfirmedhistory
     wave.boxTopPrice3 := 3 * (wave.price4 - wave.price3) + (wave.boxTopPrice - wave.price4) + wave.price3
     wave.boxTopPrice4 := 4 * (wave.price4 - wave.price3) + (wave.boxTopPrice - wave.price4) + wave.price3
     wave.boxTopPrice5 := 5 * (wave.price4 - wave.price3) + (wave.boxTopPrice - wave.price4) + wave.price3
-    wave.midADPrice := (math.abs(wave.priceD - wave.price1) * 0.5) + math.min(wave.price1, wave.priceD)                         // FIXME not really AD mid, have to find low and high of A,B,C,D
+    float halfADPrice = 0.5 * (math.max(wave.price1, wave.price2, wave.price3, wave.priceD) - math.min(wave.price1, wave.price2, wave.price3, wave.priceD))   // ABCD median (relative)
+    wave.midADPrice := wave.baNegative ? wave.price1 - halfADPrice : wave.price1 + halfADPrice                                                                // ABCD mid point (absolute)
+    // log.info(str.format("{0, number, #.####}", wave.midADPrice))
     wave.boxPriceEBot := wave.midADPrice
-    float proxy = wave.boxTopPrice                                              // FIXME please do way better than this
-    if (wave.priceD > wave.price4)
-        proxy := wave.price4
-    if (wave.priceD > wave.boxTopPrice)
-        proxy := wave.boxTopPrice
-    if (wave.priceD > (wave.boxTopPrice2 - (wave.boxTopPrice - wave.price4)))
-        proxy := (wave.boxTopPrice2 - (wave.boxTopPrice - wave.price4))
-    wave.boxPriceETop := wave.boxPriceEBot + (wave.priceD - proxy)             // Bot + (D - 2N or D - E or D - N)
-    if wave.priceD < wave.midADPrice
-        if (wave.priceD < wave.price4)
-            proxy := wave.price4
-        if (wave.priceD < wave.boxTopPrice)
-            proxy := wave.boxTopPrice
-        if (wave.priceD < (wave.boxTopPrice2 - (wave.boxTopPrice - wave.price4)))
-            proxy := (wave.boxTopPrice2 - (wave.boxTopPrice - wave.price4))
-        wave.boxPriceETop := wave.boxPriceEBot - math.abs(wave.priceD - proxy)             // Bot + (D - 2N or D - E or D - N)        
-        // float temp = wave.boxPriceETop
-        // wave.boxPriceETop := wave.boxPriceEBot
-        // wave.boxPriceEBot := temp
+    float deltaEN = wave.boxTopPrice - wave.price4
+    wave.boxPriceETop := wave.boxPriceEBot + closestLevel(wave.baNegative, wave.priceD, wave.price4, wave.boxTopPrice, wave.boxTopPrice2 - deltaEN, wave.boxTopPrice2)
     wave.boxTimeE0 := (wave.timeD - wave.time3) + wave.timeD
     wave.boxTimeE1 := (wave.timeD - wave.time1) + wave.timeD
+    wave.boxPriceEAnchor := wave.baNegative ? wave.priceD + math.min(wave.boxPriceEBot - wave.priceD, wave.boxPriceETop - wave.priceD) : wave.priceD + math.max(wave.boxPriceEBot - wave.priceD, wave.boxPriceETop - wave.priceD)
     wave.barWidthInPixels := math.abs(bar_index - bar_index[1])
-
-    log.info(str.format("{0, number, #.##}", wave.retracement) + "% retracement, nWave is " + str.tostring(wave.nWave) + ", pWave is " + str.tostring(wave.pWave) + ", sWave is " + str.tostring(wave.sWave))
-
+    // log.info(str.format("{0, number, #.##}", wave.retracement) + "% retracement, nWave is " + str.tostring(wave.nWave) + ", pWave is " + str.tostring(wave.pWave) + ", sWave is " + str.tostring(wave.sWave))
     drawIndicator(wave)
 
 if barstate.islast
