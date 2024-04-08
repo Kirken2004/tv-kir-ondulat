@@ -100,7 +100,7 @@ Above that, arrows **N, V, E** and **NT** can still reveal potential targets.
 
 When the market is strongly bullish or bearish, it's not unusual to watch the price go crazy above or below the window. In such cases, the chart may follow a strength arrow that is a multiple of **E** or **N**. That's why this script has an option to display those multiples as new attractive targets. Take notes that 5E/5N are irrational targets.
 
-The **E-Box** is a potential timed window and a target area for the next wave after D. At the moment, the feature is unstable. It won't work well within a **P-Wave**. You need to place a **Point D** situated in time after **Point C**. Just move the point before or after to toggle this feature (if enabled in the settings).
+The **E-Box** is a potential timed window and a target area for the next wave after D. At the moment, the feature is unstable. It won't work well within a **P|S-Wave**. You need to place a **Point D** situated in time after **Point C**. Just move the point before or after to toggle this feature (if enabled in the settings).
 
 The **SLP** stands for **Straight Linear Projection**. It's really just the direction the chart is heading into from the C point to now (now being the last confirmed bar). It has no real value. The calculated value shown in the purple label is the market price this chart would end up at if continuing in that direction, up to the **Target Time**.
 
@@ -108,12 +108,15 @@ I also added a feature called **Tenkan Crossover Markers**. An arrow is displaye
 
 The **Kihon Suchi** series describe a typical number of bars after which the Tenkan sen crosses over the Kijun sen. It's theory. And prone to errors by 2 due to the nature of bars in a timeframe. After the last crossing, one can expect to see the next one following that series. I added this indicator for fun. The dashed gold line is not on the series. It shows the bar in the future that correspond to the same cycle than the last one. The numbers of the series can be displayed at the bottom center of the chart. 
 
+I also gave you a **Fibonacci Axis** you can offset laterally on your chart in bar steps. It has two scales, one for a loss retracing B to A. And one for a gain from C to N. 
+If you enable the **C to N** feature, you'll have %gain in realtime displayed on the axis. It doesn't work well for non N-Wave structures yet.
+
 At the moment, this indicator is tedious to use on several charts at once : 
     - You may require one layout(tab) per chart. 
     - Switching between symbols is not working. 
     - I wish i could draw several instances of this indicator on one chart without any trouble. 
-    - Dont check every option at once, you'll lose elements past 100 ones on the chart per indicator. 
-I'm pretty sure you'll find a comfy way to use it anyhow. 
+    - Dont check every option at once, you'll lose elements past 150 elements on the chart per indicator. 
+Even imperfect, i'm pretty sure you'll find a comfy way to use it anyhow. 
 
 
 ## F.A.Q.

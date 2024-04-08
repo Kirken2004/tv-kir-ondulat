@@ -1,5 +1,5 @@
 //@version=5
-indicator("Kir Ondulatoire", shorttitle="KOndulat", overlay=true, max_labels_count = 100)
+indicator("Kir Ondulatoire", shorttitle="KOndulat", overlay=true, max_labels_count = 150)
 
     // version 0.9.4
 
@@ -35,7 +35,7 @@ pret = input.float(defval=50.0, title="% Retracement for a P-Wave", inline="opti
 mult = input.bool(defval=false, title="Multiples of E/N waves", inline="option2", group="Wave options", tooltip="Won't work in case of an S-Wave")
 ebox = input.bool(defval=true, title="E-Box", inline="option3", group="Wave options", tooltip="Need the point D to be placed after time C [STILL BUGGED AT THE MOMENT].")
 ecol = input.color(defval=color.aqua, title=" ", inline="option3", group="Wave options")
-tend = input.bool(defval=false, title="Straight Linear Projection", inline="option4", group="Wave options", tooltip="As long as the TARGET TIME is not reached, a purple arrow will point to the target. A purple label will give the estimated target price. It's a silly feature.")
+tend = input.bool(defval=false, title="Straight Linear Projection", inline="option4", group="Wave options", tooltip="SLP: As long as the TARGET TIME is not reached, a purple arrow will point to the target. A purple label will give the estimated target price. It's a silly feature.")
 labp = input.bool(defval=false, title="Price in labels", inline="option5", group="Wave options")
 tren = input.bool(defval=false, title="Wave Trend Lines", inline="option6", group="Wave options", tooltip = "Only visibles if D label is also visible. Help to visually confirm if ABCD is an N/Y/P wave.")
 tcol = input.color(defval=color.green, title=" ", inline="option6", group="Wave options")
@@ -52,6 +52,7 @@ ksob = input.bool(defval=false, title="from B", inline="option1", group="Kihon S
 ac26 = input.bool(defval=false, title="26 periods after A/C", inline="option1", group="Miscellaneous options", tooltip = "The Kumo cloud between those two deadlines gives an active area to keep an eye on. Up to you to draw a bounding box there.")
 dema = input.bool(defval=false, title="EMA", inline="option2", group="Miscellaneous options")
 fibo = input.bool(defval=false, title="Fibonacci Axis", inline="option3", group="Miscellaneous options")
+cton = input.bool(defval=false, title="C to N", inline="option3", group="Miscellaneous options", tooltip="C to N: Gives you the expected pluvalue from C to N, then the realised ratio.\nN/AB gives you the current position on the fibo axis. To N when in continuation, to AB when retracing C.")
 
 int realtimeTime = 1
 float realtimePrice = 1.0
@@ -551,8 +552,32 @@ formatPrice(float predi) =>
         result := str.format("{0, number, ###.###}", predi / 1000) + "K"
     result
 
-drawSLP(Wave t) =>
+drawCtoN(Wave t) =>
+    float ratioNAB = 0.0
+    int offsetXFiboM = (candleTime * fiboBarOffset) + t.time2
+    float ratioN = 100.0 * ((t.price4-t.price3) / t.price3)
+    float ratioC = 100.0 * math.abs((t.currentPrice-t.price3) / t.price3) * (t.price1 > t.price2 ? -1 : 1)
+    if t.currentPrice > t.price2
+        ratioNAB := t.baNegative ? -100.0 * math.abs((t.price2-t.currentPrice)/(t.price1-t.price2)) : 100.0 * math.abs((t.currentPrice-t.price3)/(t.price4-t.price3))
+    else
+        ratioNAB := t.baNegative ? 100.0 * math.abs((t.currentPrice-t.price3)/(t.price4-t.price3)) : -100.0 * math.abs((t.price2-t.currentPrice)/(t.price1-t.price2))
+    string sratioN = '100% = ' + (ratioN < 0 ? '': '+') + str.format("{0, number, #.##}", ratioN) + ' % FROM C'
+    string sratioC = (ratioC < 0 ? '': '+') + str.format("{0, number, #.##}", ratioC) + ' %'
+    string sratioNAB = (ratioNAB < 0 ? '' : '+') + str.format("{0, number, #.##}", ratioNAB) + ' %'
+    label.new(offsetXFiboM, t.price4, sratioN, xloc.bar_time, yloc.price, color.rgb(255, 153, 0), label.style_label_left, color.rgb(0, 0, 0), size.normal, text.align_center, '', font.family_monospace)
+    var labelRatioC = label.new(offsetXFiboM, t.currentPrice, sratioC, xloc.bar_time, yloc.price, color.rgb(96,96,96), label.style_label_right, color.rgb(255, 255, 255), size.normal, text.align_center, '', font.family_monospace)
+    var labelRatioNAB = label.new(offsetXFiboM, t.currentPrice, sratioNAB, xloc.bar_time, yloc.price, color.rgb(38,166,154), label.style_label_left, color.rgb(255, 255, 255), size.normal, text.align_center, '', font.family_monospace)
+    if t.price1 < t.price2 and t.currentPrice <= t.price2
+        labelRatioC.set_style(label.style_label_left)
+        labelRatioNAB.set_style(label.style_label_right)
+        labelRatioNAB.set_color(color.rgb(255, 82, 82))
+    if t.price1 > t.price2 and t.currentPrice >= t.price2
+        labelRatioC.set_style(label.style_label_left)
+        labelRatioNAB.set_style(label.style_label_right)
+        labelRatioNAB.set_color(color.rgb(255, 82, 82))
 
+drawSLP(Wave t) =>
+    
     // Stupid Linear Prediction
     if tend and t.time4 > t.currentTime
         var nBarOvershoot = 5
@@ -562,18 +587,25 @@ drawSLP(Wave t) =>
 
         label.new(t.currentTime, na, "SLP=" + formatPrice(predi), xloc.bar_time, yloc.abovebar, color.rgb(132, 0, 255), label.style_label_lower_left, size=size.small, textcolor = color.rgb(255, 255, 255), textalign = text.align_center)
         line.new(t.currentTime, t.currentPrice, timeAtOvershoot, slpPrice, xloc=xloc.bar_time, color=color.purple, style=line.style_arrow_right, width=1)
-
+    
 if barstate.isrealtime and not barstate.isconfirmed
 
     Wave wave = Wave.new()
 
+    wave.price1 := y1Input
+    wave.price2 := y2Input
+    wave.baNegative := wave.price1 > wave.price2
+    wave.time2 := x2Input    
     wave.time3  := x3Input
     wave.price3 := y3Input
+    wave.price4 := y3Input + (y2Input - y1Input)
     wave.time4  := x3Input + (x2Input - x1Input)
 
     wave.currentPrice := close //barstate.islastconfirmedhistory ? close : 1
     wave.currentTime := time //barstate.islastconfirmedhistory ? time : wave.time3
     
+    if cton
+        drawCtoN(wave)
     drawSLP(wave)
 
 closestLevel(bool baNegative, float d, float n, float e, float n2, float e2) => 
