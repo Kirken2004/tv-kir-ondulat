@@ -45,9 +45,10 @@ ichi = input.bool(defval=false, title="Ichimoku Kinko Hyo", inline="option1", gr
 crss = input.bool(defval=false, title="Tenkan Crossover/under markers.", inline="option2", group="Ichimoku options")
 maxl = input.int(10, minval=1, title=" up to", inline="option2", group="Ichimoku options", tooltip = "An indicator is limited in the allowed amount of labels to draw. Keep this value low enough to prevent having lost labels.")
 
+ksof = input.int(defval=0, title="Offseted in bars", inline="option1", group="Kihon Suchi options")
 ksmx = input.int(defval=42, title="Max period", inline="option1", group="Kihon Suchi options", tooltip = "Won't draw Ichimoku times after this elapsed period")
-kisu = input.bool(defval=false, title="from last Crossover", inline="option1", group="Kihon Suchi options", tooltip = "Need Tenkan crossovers to be displayed to add predictions")
-ksob = input.bool(defval=false, title="from B", inline="option1", group="Kihon Suchi options", tooltip = "Won't work if previous option is checked")
+kisu = input.bool(defval=false, title="from last Crossover", inline="option2", group="Kihon Suchi options", tooltip = "Need Tenkan crossovers to be displayed to work.")
+ksob = input.bool(defval=false, title="from B", inline="option2", group="Kihon Suchi options", tooltip = "Won't work if previous option is checked.")
 
 ac26 = input.bool(defval=false, title="26 periods after A/C", inline="option1", group="Miscellaneous options", tooltip = "The Kumo cloud between those two deadlines gives an active area to keep an eye on. Up to you to draw a bounding box there.")
 dema = input.bool(defval=false, title="EMA", inline="option2", group="Miscellaneous options")
@@ -447,7 +448,7 @@ drawIndicator(Wave t) =>
         labelAfterTargetETime.set_x(t.boxTimeE1)
         labelAfterTargetETime.set_y(t.boxPriceELabels)
         labelAfterTargetETime.set_yloc(yloc.price)
-        labelAfterTargetETime.set_text(str.format_time(t.boxTimeE1, 'dd-MMM-yyyy\nHH:mm:ss', "UTC+2"))        
+        labelAfterTargetETime.set_text(str.format_time(t.boxTimeE1, 'dd-MMM-yyyy\nHH:mm:ss', "UTC+2"))
         if t.priceD < t.boxPriceELabels
             labelBeforeTargetETime.set_style(label.style_label_down)
             labelAfterTargetETime.set_style(label.style_label_down)
@@ -457,7 +458,7 @@ drawIndicator(Wave t) =>
         int[] cycles = array.from(0,9,17,26,33,42,51,65,76,83,97,101,151,226)
         for i = array.size(cycles) - 1 to 0
             if array.get(cycles, i) <= ksmx 
-                cycle = (array.get(cycles, i) * candleTime) + pointB
+                cycle = (array.get(cycles, i) * candleTime) + pointB + (candleTime * ksof)
                 if i > 0
                     line.new(cycle, math.min(y1Input, y2Input, y3Input), cycle, math.max(y1Input, y2Input, y3Input), xloc.bar_time, extend.both, color.rgb(33, 149, 243, 50), line.style_dotted, 2)
                 label.new(cycle, t.price2, str.format("{0, number, ##}", array.get(cycles, i)), xloc.bar_time, yloc.price, color.rgb(27, 32, 36, 100), label.style_label_left, color.blue )
@@ -711,7 +712,7 @@ if crss and barstate.islastconfirmedhistory
         int[] cycles = array.from(0,9,17,26,33,42,51,65,76,83,97,101,151,226)
         for i = array.size(cycles) - 1 to 0
             if array.get(cycles, i) <= ksmx 
-                cycle = array.get(cycles, i) + lastCrossBar
+                cycle = array.get(cycles, i) + lastCrossBar + ksof
                 if i > 0
                     line.new(cycle, math.min(y1Input, y2Input, y3Input), cycle, math.max(y1Input, y2Input, y3Input), xloc.bar_index, extend.both, color.yellow, line.style_dotted, 1)
                 label.new(cycle, y2Input, str.format("{0, number, ##}", array.get(cycles, i)), xloc.bar_index, yloc.price, color.rgb(27, 32, 36, 100), label.style_label_left, color.yellow )
