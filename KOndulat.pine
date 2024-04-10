@@ -548,10 +548,7 @@ drawIndicator(Wave t) =>
         line.new(offsetXFiboM, botAxis, offsetXFiboM, topAxis, xloc = xloc.bar_time, color = fiboAxisColor, width=1, style=line.style_solid)   // vertical scale axis
         
 formatPrice(float predi) =>
-    var result = str.format("{0, number, ###}", predi)
-    if predi > 1000
-        result := str.format("{0, number, ###.###}", predi / 1000) + "K"
-    result
+    str.tostring(predi, format.volume)
 
 drawCtoN(Wave t) =>
     float ratioNAB = 0.0
