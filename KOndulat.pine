@@ -602,7 +602,7 @@ if barstate.isrealtime and not barstate.isconfirmed
         drawCtoN(wave)
     drawSLP(wave)
 
-closestLevel(bool baNegative, float d, float n, float e, float n2, float e2) => 
+closestLevel(bool baNegative, float d, float n, float e, float n2, float e2, float n3, float e3, float n4, float e4) => 
     float level = 0
     if baNegative == false
         if d>n
@@ -613,6 +613,14 @@ closestLevel(bool baNegative, float d, float n, float e, float n2, float e2) =>
             level := d-n2
         if d>e2
             level := d-e2
+        if d>n3
+            level := d-n3
+        if d>e3
+            level := d-e3
+        if d>n4
+            level := d-n4
+        if d>e4
+            level := d-e4
     if baNegative
         if d<n
             level := n-d
@@ -622,6 +630,14 @@ closestLevel(bool baNegative, float d, float n, float e, float n2, float e2) =>
             level := n2-d
         if d<e2
             level := e2-d
+        if d<n3
+            level := n3-d
+        if d<e3
+            level := e3-d
+        if d<n4
+            level := n4-d
+        if d<e4
+            level := e4-d
     level
 
 // Draw the indicator on next confirmed tick
@@ -672,7 +688,7 @@ if barstate.islastconfirmedhistory
     // log.info(str.format("{0, number, #.####}", wave.midADPrice))
     wave.boxPriceEBot := wave.midADPrice
     float deltaEN = wave.boxTopPrice - wave.price4
-    wave.boxPriceETop := wave.boxPriceEBot + closestLevel(wave.baNegative, wave.priceD, wave.price4, wave.boxTopPrice, wave.boxTopPrice2 - deltaEN, wave.boxTopPrice2)
+    wave.boxPriceETop := wave.boxPriceEBot + closestLevel(wave.baNegative, wave.priceD, wave.price4, wave.boxTopPrice, wave.boxTopPrice2 - deltaEN, wave.boxTopPrice2, wave.boxTopPrice3 - deltaEN, wave.boxTopPrice3, wave.boxTopPrice4 - deltaEN, wave.boxTopPrice4)
     wave.boxTimeE0 := (wave.timeD - wave.time3) + wave.timeD
     wave.boxTimeE1 := (wave.timeD - wave.time1) + wave.timeD
     wave.boxPriceEAnchor := wave.baNegative ? wave.priceD + math.min(wave.boxPriceEBot - wave.priceD, wave.boxPriceETop - wave.priceD) : wave.priceD + math.max(wave.boxPriceEBot - wave.priceD, wave.boxPriceETop - wave.priceD)
