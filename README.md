@@ -106,7 +106,10 @@ The **SLP** stands for **Straight Linear Projection**. It's really just the dire
 
 I also added a feature called **Tenkan Crossover Markers**. An arrow is displayed above bars when a Tenkan crossed over the Kijun. The numerical value indicate the number of bars since the last event of that kind occured on the left. When the tenkan is crossing over, it's often accompanied by a movement up or down of the price. It's a change in the structure itself. It's important to follow those crossovers. 
 
-The **Kihon Suchi** series describe a typical number of bars after which the Tenkan sen crosses over the Kijun sen. It's theory. And prone to errors by 2 due to the nature of bars in a timeframe. After the last crossing, one can expect to see the next one following that series. I added this indicator for fun. The dashed gold line is not on the series. It shows the bar in the future that correspond to the same cycle than the last one. The numbers of the series can be displayed at the bottom center of the chart. 
+The **Kihon Suchi** series represent times in ichimoku. One of these numbers can appear in many ways. 
+It can describe a typical number of bars after which the Tenkan sen crosses over the Kijun sen. It's theory. And prone to errors by 2 due to the nature of bars in a timeframe. After the last crossing, one can expect to see the next one following that series. I added this indicator for fun. The dashed gold line is not on the series. It shows the bar in the future that correspond to the same cycle than the last one. The numbers of the series can be displayed at the bottom center of the chart. 
+**Taito Suchi** is a situation where two waves have the same number of candles. Finding a Taito Suchi can indicate you found an interesting ABC. 
+D is probably going to occur on a Kihon Suchi period aswell, from C.
 
 I also gave you a **Fibonacci Axis** you can offset laterally on your chart in bar steps. It has two scales, one for a loss retracing B to A. And one for a gain from C to N. 
 If you enable the **C to N** feature, you'll have %gain in realtime displayed on the axis. It doesn't work well for non N-Wave structures yet.

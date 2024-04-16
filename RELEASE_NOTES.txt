@@ -1,9 +1,13 @@
 VERSION HISTORY
 
-    v0.9.5 - 08-06-2024
+    v0.9.5 - 04-17-2024
 
         - added labels on fibo axis following the price and giving %gain on C to N (won't matter on other structures than N-Waves yet)
+        - added Taito Suchi indicator
+            o added Correlation to Ichimoku numbers (+1/-1 of any Kihon Suchi number, or natural in 26 periods) as bottom right box message
+            o added a box message in top right corner if ab = bc or bc = cd
         - fixed the labels around the E-Box
+        - improved the correction prediction for E-Box
         - improved the documentation
 
     v0.9.4 - 04-06-2024

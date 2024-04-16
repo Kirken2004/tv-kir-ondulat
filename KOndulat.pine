@@ -1,7 +1,7 @@
 //@version=5
 indicator("Kir Ondulatoire", shorttitle="KOndulat", overlay=true, max_labels_count = 150)
 
-    // version 0.9.4
+    // version 0.9.5
 
     // Copyright (C) 2024  Kir (https://github.com/Kirken2004/tv-kir-ondulat)
 
@@ -49,6 +49,7 @@ ksof = input.int(defval=0, title="Offseted in bars", inline="option1", group="Ki
 ksmx = input.int(defval=42, title="Max period", inline="option1", group="Kihon Suchi options", tooltip = "Won't draw Ichimoku times after this elapsed period")
 kisu = input.bool(defval=false, title="from last Crossover", inline="option2", group="Kihon Suchi options", tooltip = "Need Tenkan crossovers to be displayed to work.")
 ksob = input.bool(defval=false, title="from B", inline="option2", group="Kihon Suchi options", tooltip = "Won't work if previous option is checked.")
+tasu = input.bool(defval=false, title="Taito Suchi or any correlation", inline="option3", group="Kihon Suchi options", tooltip = "Search for an AC or BD correlation with Kihon Suchi numbers. +1/-1 also works. 26 is natural.")
 
 ac26 = input.bool(defval=false, title="26 periods after A/C", inline="option1", group="Miscellaneous options", tooltip = "The Kumo cloud between those two deadlines gives an active area to keep an eye on. Up to you to draw a bounding box there.")
 dema = input.bool(defval=false, title="EMA", inline="option2", group="Miscellaneous options")
@@ -59,7 +60,9 @@ int realtimeTime = 1
 float realtimePrice = 1.0
 int labelCount = 0
 
-var tab = table.new(position.bottom_center, 1, 1)
+var tabKisu = table.new(position.bottom_center, 1, 1)
+var tabCorr = table.new(position.bottom_right, 1, 1)
+var tabTasu = table.new(position.top_right, 1, 1)
 
 type Wave
     int   time1
@@ -81,6 +84,7 @@ type Wave
     float priceDelta2
     int   timeDelta1
     int   timeDelta2
+    int   timeDelta3
     int   boxTime0
     int   boxTime1
     int   boxTimeE0
@@ -463,6 +467,39 @@ drawIndicator(Wave t) =>
                     line.new(cycle, math.min(y1Input, y2Input, y3Input), cycle, math.max(y1Input, y2Input, y3Input), xloc.bar_time, extend.both, color.rgb(33, 149, 243, 50), line.style_dotted, 2)
                 label.new(cycle, t.price2, str.format("{0, number, ##}", array.get(cycles, i)), xloc.bar_time, yloc.price, color.rgb(27, 32, 36, 100), label.style_label_left, color.blue )
 
+    if tasu
+        string txtCorr = "Wave ABC is not correlated"
+        bool corr = false
+        int[] naturalCycles = array.from(25,26,27)
+        int ab = t.timeDelta1 / 1000 / nb_seconds
+        int bc = t.timeDelta2 / 1000 / nb_seconds
+        int cd = t.timeDelta3 / 1000 / nb_seconds
+        int abc = ab + bc + 1
+        int bcd = (t.timeD > t.time3) ? bc + cd + 1 : na
+        log.info(str.tostring(bcd))
+        for i = array.size(naturalCycles) - 1 to 0
+            if array.get(naturalCycles, i) == abc or array.get(naturalCycles, i) == bcd
+                corr := true
+                txtCorr := "Wave ABC is natural"
+                break
+        if corr == false
+            int[] kisuCycles = array.from(9,17,33,42,51,65,76,83,97,101,151,226)
+            for i = array.size(kisuCycles) - 1 to 0
+                if array.get(kisuCycles, i) == abc or array.get(kisuCycles, i) == bcd
+                    corr := true
+                    txtCorr := "Wave ABC is correlated"
+                    break
+            if corr == false
+                for i = array.size(kisuCycles) - 1 to 0
+                    if array.get(kisuCycles, i)-1 == abc or array.get(kisuCycles, i)-1 == bcd or array.get(kisuCycles, i)+1 == abc or array.get(kisuCycles, i)+1 == bcd
+                        corr := true
+                        txtCorr := "Wave ABC is +1/-1 correlated"
+                        break
+        color colCorr = corr ? color.lime : color.red
+        table.cell(tabCorr, 0, 0, txtCorr, 17, 3, text_color = color.white, text_size = size.small, bgcolor = colCorr)
+        if ab == bc or bc == cd
+            table.cell(tabTasu, 0, 0, "Taito Suchi", 17, 3, text_color = color.yellow, text_size = size.small, bgcolor = color.maroon)
+
     if fibo
         var offsetXFiboM = (candleTime * fiboBarOffset) + t.time2
         var offsetXFiboL = offsetXFiboM - (candleTime * fiboBarWidth)
@@ -669,6 +706,7 @@ if barstate.islastconfirmedhistory
     wave.priceDelta2 := y3Input - y2Input
     wave.timeDelta1 := x2Input - x1Input
     wave.timeDelta2 := x3Input - x2Input
+    wave.timeDelta3 := x4Input - x3Input
     wave.boxTime0 := wave.time4 - wave.timeDelta2
     wave.boxTime1 := wave.time4 + wave.timeDelta2
     wave.boxEPrice := (wave.price2 - wave.price1) + wave.price2                                                                 // E:  BD = AB
@@ -700,7 +738,7 @@ if barstate.islastconfirmedhistory
 if barstate.islast
     
     if kisu or ksob
-        table.cell(tab, 0, 0, "Kihon Suchi 9, 17, 26, 33, 42, 51, 65, 76,,,", 17, 3, text_color = color.yellow, text_size = size.small, bgcolor = color.rgb(61, 61, 61))
+        table.cell(tabKisu, 0, 0, "Kihon Suchi 9, 17, 26, 33, 42, 51, 65, 76,,,", 17, 3, text_color = color.yellow, text_size = size.small, bgcolor = color.rgb(61, 61, 61))
 
 // Ichimoku stuff
 plot(ichi ? conversionLine : na, color=#4385ff, title="Tekan Conversion Line")                                        // TENKAN SEN
