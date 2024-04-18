@@ -1,7 +1,7 @@
 //@version=5
 indicator("Kir Ondulatoire", shorttitle="KOndulat", overlay=true, max_labels_count = 150)
 
-    // version 0.9.5
+    // version 0.9.4
 
     // Copyright (C) 2024  Kir (https://github.com/Kirken2004/tv-kir-ondulat)
 
@@ -32,9 +32,11 @@ x4Input = input.time(TIME_DEFAULT,   "Point D", inline = "4", confirm = true)
 y4Input = input.price(PRICE_DEFAULT, "",        inline = "4", tooltip = "Pick point D (place before C to ignore)", confirm = true)
 
 pret = input.float(defval=50.0, title="% Retracement for a P-Wave", inline="option1", group="Wave options", tooltip="By default, a P wave is forming if the move BC retraced more than 50% of AB. N waves are more certain between 33% and 50%. Alter this if you think the situation is blurry.")
-mult = input.bool(defval=false, title="Multiples of E/N waves", inline="option2", group="Wave options", tooltip="Won't work in case of an S-Wave")
-ebox = input.bool(defval=true, title="E-Box", inline="option3", group="Wave options", tooltip="Need the point D to be placed after time C [STILL BUGGED AT THE MOMENT].")
+mult = input.bool(defval=false, title="Multiples of E/N waves", inline="option2", group="Wave options", tooltip="Won't work in case of an S-Wave.")
+tim3 = input.bool(defval=false, title="Extend to deadline", inline="option2b", group="Wave options", tooltip="Extend the strength lines to the end of the target period.")
+ebox = input.bool(defval=true, title="E-Box", inline="option3", group="Wave options")
 ecol = input.color(defval=color.aqua, title=" ", inline="option3", group="Wave options")
+bcd4 = input.bool(defval=false, title="Extend from BCD", inline="option3", group="Wave options", tooltip="E-Box\nNeed the point D to be placed after time C [STILL BUGGED AT THE MOMENT].\n\nBCD\nDraw new strength lines from D if placed after time C.")
 tend = input.bool(defval=false, title="Straight Linear Projection", inline="option4", group="Wave options", tooltip="SLP: As long as the TARGET TIME is not reached, a purple arrow will point to the target. A purple label will give the estimated target price. It's a silly feature.")
 labp = input.bool(defval=false, title="Price in labels", inline="option5", group="Wave options")
 tren = input.bool(defval=false, title="Wave Trend Lines", inline="option6", group="Wave options", tooltip = "Only visibles if D label is also visible. Help to visually confirm if ABCD is an N/Y/P wave.")
@@ -45,11 +47,11 @@ ichi = input.bool(defval=false, title="Ichimoku Kinko Hyo", inline="option1", gr
 crss = input.bool(defval=false, title="Tenkan Crossover/under markers.", inline="option2", group="Ichimoku options")
 maxl = input.int(10, minval=1, title=" up to", inline="option2", group="Ichimoku options", tooltip = "An indicator is limited in the allowed amount of labels to draw. Keep this value low enough to prevent having lost labels.")
 
-ksof = input.int(defval=0, title="Offseted in bars", inline="option1", group="Kihon Suchi options")
+ksof = input.int(defval=0, title="Bar Offset", inline="option1", group="Kihon Suchi options")
 ksmx = input.int(defval=42, title="Max period", inline="option1", group="Kihon Suchi options", tooltip = "Won't draw Ichimoku times after this elapsed period")
 kisu = input.bool(defval=false, title="from last Crossover", inline="option2", group="Kihon Suchi options", tooltip = "Need Tenkan crossovers to be displayed to work.")
 ksob = input.bool(defval=false, title="from B", inline="option2", group="Kihon Suchi options", tooltip = "Won't work if previous option is checked.")
-tasu = input.bool(defval=false, title="Taito Suchi or any correlation", inline="option3", group="Kihon Suchi options", tooltip = "Search for an AC or BD correlation with Kihon Suchi numbers. +1/-1 also works. 26 is natural.")
+tasu = input.bool(defval=true, title="Taito Suchi or any correlation", inline="option3", group="Kihon Suchi options", tooltip = "Search for an AC or BD correlation with Kihon Suchi numbers. +1/-1 also works. 26 is natural.")
 
 ac26 = input.bool(defval=false, title="26 periods after A/C", inline="option1", group="Miscellaneous options", tooltip = "The Kumo cloud between those two deadlines gives an active area to keep an eye on. Up to you to draw a bounding box there.")
 dema = input.bool(defval=false, title="EMA", inline="option2", group="Miscellaneous options")
@@ -297,8 +299,8 @@ drawIndicator(Wave t) =>
 
     // Wave labels
     var textA = "A" + (labp ? "\n" + str.format("{0, number, #.##}", t.price1) : "")
-    var textB = "B\n" + str.format("{0, number, ###}", 1 + ((t.time2 - t.time1) / nb_seconds / 1000)) + (labp ? "\n" + str.format("{0, number, #.##}", t.price2) : "")
-    var textC = "C\n" + str.format("{0, number, ###}", 1 + ((t.time3 - t.time1 + 1.001) / nb_seconds / 1000)) + (labp ? "\n" + str.format("{0, number, #.##}", t.price3) : "")
+    var textB = "B\n" + str.format("{0, number, ###}", 1 + ((t.time2 - t.time1) / candleTime)) + (labp ? "\n" + str.format("{0, number, #.##}", t.price2) : "")
+    var textC = "C\n" + str.format("{0, number, ###}", 1 + ((t.time3 - t.time1 + 1.001) / candleTime)) + (labp ? "\n" + str.format("{0, number, #.##}", t.price3) : "")
     label.new(t.time1, t.price1, textA, xloc.bar_time, yloc.price, pointFillColor, styleABC, pointTextColor, size.small, text.align_center)
     label.new(t.time2, t.price2, textB, xloc.bar_time, yloc.price, pointFillColor, styleABC2, pointTextColor, size.small, text.align_center)
     label.new(t.time3, t.price3, textC, xloc.bar_time, yloc.price, pointFillColor, styleABC, pointTextColor, size.small, text.align_center)
@@ -307,7 +309,6 @@ drawIndicator(Wave t) =>
     priceDeci = (t.price4 - t.price3) / 10
     timeDeci = (t.boxTime1 - t.boxTime0) / 10
     int labelTextWidth = str.length(labelTargetPriceNt.get_text()) * 6 / 10
-    //log.info(str.format("{0, number, ###.###}", labelTextWidth))
 
     // Retracement of C over BA
     labelRetracementBC.set_style(styleRetrac)
@@ -426,7 +427,7 @@ drawIndicator(Wave t) =>
 
     // Point D is only labeled if positionned after Time C
     if t.timeD > t.time3
-        label.new(t.timeD, t.priceD, "D\n" + str.format("{0, number, ###}", 1 + ((t.timeD - t.time1) / nb_seconds / 1000)) + (labp ? "\n" + str.format("{0, number, #.####}", t.priceD) : ""), xloc.bar_time, yloc.price, pointFillColor, styleABC2, pointTextColor, size.small, text.align_center)
+        label.new(t.timeD, t.priceD, "D\n" + str.format("{0, number, ###}", 1 + ((t.timeD - t.time1) / candleTime)) + (labp ? "\n" + str.format("{0, number, #.####}", t.priceD) : ""), xloc.bar_time, yloc.price, pointFillColor, styleABC2, pointTextColor, size.small, text.align_center)
         // Trendlines are drawable since D is visible
         if tren
             line.new(t.time1, t.price1, t.time3, t.price3, xloc=xloc.bar_time, color=tcol, style = line.style_solid, width=twid, extend = extend.both)
@@ -471,9 +472,9 @@ drawIndicator(Wave t) =>
         string txtCorr = "Wave ABC is not correlated"
         bool corr = false
         int[] naturalCycles = array.from(25,26,27)
-        int ab = t.timeDelta1 / 1000 / nb_seconds
-        int bc = t.timeDelta2 / 1000 / nb_seconds
-        int cd = t.timeDelta3 / 1000 / nb_seconds
+        int ab = t.timeDelta1 / candleTime
+        int bc = t.timeDelta2 / candleTime
+        int cd = t.timeDelta3 / candleTime
         int abc = ab + bc + 1
         int bcd = (t.timeD > t.time3) ? bc + cd + 1 : na
         log.info(str.tostring(bcd))
@@ -496,9 +497,9 @@ drawIndicator(Wave t) =>
                         txtCorr := "Wave ABC is +1/-1 correlated"
                         break
         color colCorr = corr ? color.lime : color.red
-        table.cell(tabCorr, 0, 0, txtCorr, 17, 3, text_color = color.white, text_size = size.small, bgcolor = colCorr)
+        table.cell(tabCorr, 0, 0, txtCorr, 10, 3, text_color = color.white, text_size = size.small, bgcolor = colCorr)
         if ab == bc or bc == cd
-            table.cell(tabTasu, 0, 0, "Taito Suchi", 17, 3, text_color = color.yellow, text_size = size.small, bgcolor = color.maroon)
+            table.cell(tabTasu, 0, 0, "Taito Suchi", 5, 3, text_color = color.yellow, text_size = size.small, bgcolor = color.maroon)
 
     if fibo
         var offsetXFiboM = (candleTime * fiboBarOffset) + t.time2

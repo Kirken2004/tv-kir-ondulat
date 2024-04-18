@@ -100,7 +100,7 @@ Above that, arrows **N, V, E** and **NT** can still reveal potential targets.
 
 When the market is strongly bullish or bearish, it's not unusual to watch the price go crazy above or below the window. In such cases, the chart may follow a strength arrow that is a multiple of **E** or **N**. That's why this script has an option to display those multiples as new attractive targets. Take notes that 5E/5N are irrational targets.
 
-The **E-Box** is a potential timed window and a target area for the next wave after D. At the moment, the feature is unstable. It won't work well within a **P|S-Wave**. You need to place a **Point D** situated in time after **Point C**. Just move the point before or after to toggle this feature (if enabled in the settings).
+The **E-Box** is a potential timed window and a target area for the next correction after D. At the moment, the feature is unstable. It won't work well within a **P|S-Wave**. You need to place a **Point D** situated in time after **Point C**. Just move the point before or after C to toggle this feature (if enabled in the settings).
 
 The **SLP** stands for **Straight Linear Projection**. It's really just the direction the chart is heading into from the C point to now (now being the last confirmed bar). It has no real value. The calculated value shown in the purple label is the market price this chart would end up at if continuing in that direction, up to the **Target Time**.
 
@@ -119,6 +119,7 @@ At the moment, this indicator is tedious to use on several charts at once :
     - Switching between symbols is not working. 
     - I wish i could draw several instances of this indicator on one chart without any trouble. 
     - Dont check every option at once, you'll lose elements past 150 elements on the chart per indicator. 
+    - The indicator takes some time to load (the first time), wait for the blue notification asking to place Point A before clicking on something else.
 Even imperfect, i'm pretty sure you'll find a comfy way to use it anyhow. 
 
 
