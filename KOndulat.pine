@@ -37,7 +37,7 @@ wavw = input.int(defval=3, title="Width ", options=[1,2,3,4,5], inline="option0"
 wavs = input.string(defval="dotted", title=" ", inline="option0", group="Wave options", options=["solid","dashed","dotted"])
 pret = input.float(defval=50.0, title="% Retracement for a P-Wave", inline="option1", group="Wave options", tooltip="By default, a P wave is forming if the move BC retraced more than 50% of AB. N waves are more certain between 33% and 50%. Alter this if you think the situation is blurry.")
 mult = input.bool(defval=false, title="Multiples of E/N waves", inline="option2", group="Wave options", tooltip="Won't work in case of an S-Wave.")
-tim3 = input.bool(defval=false, title="Extend to deadline", inline="option2b", group="Wave options", tooltip="Extend the strength lines to the end of the target period (aka TIME 3).")
+tim3 = input.bool(defval=false, title="Extend to deadline", inline="option2b", group="Wave options", tooltip="Extend the strength lines to the end of the target period (aka TIME #3).")
 ebox = input.bool(defval=true, title="E-Box", inline="option3", group="Wave options")
 ecol = input.color(defval=color.aqua, title=" ", inline="option3", group="Wave options")
 bcd4 = input.bool(defval=false, title="Extend from BCD", inline="option3", group="Wave options", tooltip="E-Box\nNeed the point D to be placed after time C [STILL BUGGED AT THE MOMENT].\n\nBCD\nDraw new strength lines from D if placed after time C.")
@@ -74,6 +74,9 @@ string n2pad = "{0, number, ##}"
 string n3pad = "{0, number, ###}"
 string n2dig = "{0, number, #.##}"
 string n4dig = "{0, number, #.####}"
+
+color priceLabelColor = color.rgb(120, 123, 134, 90)
+color transparent = color.rgb(0, 0, 0, 100)
 
 type Wave
     int   time1
@@ -185,27 +188,27 @@ var labelTargetTime = label.new(x=na, y=na, text="Test", color=color.rgb(0, 137,
 var labelBeforeTargetTime = label.new(x=na, y=na, text="Test", color=color.rgb(0, 137, 123, 48), textcolor=color.rgb(255, 255, 255, 34), style=label.style_label_down, xloc=xloc.bar_time, size=size.small)
 var labelAfterTargetTime = label.new(x=na, y=na, text="Test", color=color.rgb(0, 137, 123, 48), textcolor=color.rgb(255, 255, 255, 34), style=label.style_label_down, xloc=xloc.bar_time, size=size.small)
 
-var labelTargetPriceE = label.new(x=na, y=na, text="E= na", color=color.rgb(120, 123, 134, 90), textcolor=color.blue, style=label.style_label_left, xloc=xloc.bar_time)
-var labelTargetPriceN = label.new(x=na, y=na, text="N= na", color=color.rgb(120, 123, 134, 90), textcolor=color.orange, style=label.style_label_left, xloc=xloc.bar_time)
-var labelTargetPriceV = label.new(x=na, y=na, text="V= na", color=color.rgb(120, 123, 134, 90), textcolor=color.rgb(255, 82, 102), style=label.style_label_left, xloc=xloc.bar_time)
-var labelTargetPriceNt = label.new(x=na, y=na, text="NT= na", color=color.rgb(120, 123, 134, 90), textcolor=color.green, style=label.style_label_left, xloc=xloc.bar_time)
-var labelTargetPriceP = label.new(x=na, y=na, text="P= na", color=color.rgb(120, 123, 134, 90), textcolor=color.lime, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPriceE = label.new(x=na, y=na, text="E= na", color=priceLabelColor, textcolor=color.blue, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPriceN = label.new(x=na, y=na, text="N= na", color=priceLabelColor, textcolor=color.orange, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPriceV = label.new(x=na, y=na, text="V= na", color=priceLabelColor, textcolor=color.rgb(255, 82, 102), style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPriceNt = label.new(x=na, y=na, text="NT= na", color=priceLabelColor, textcolor=color.green, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPriceP = label.new(x=na, y=na, text="P= na", color=priceLabelColor, textcolor=color.lime, style=label.style_label_left, xloc=xloc.bar_time)
 
-var labelTargetPriceY = label.new(x=na, y=na, text="Y= na", color=color.rgb(120, 123, 134, 90), textcolor=color.blue, style=label.style_label_left, xloc=xloc.bar_time)
-var labelTargetPriceS = label.new(x=na, y=na, text="S= na", color=color.rgb(120, 123, 134, 90), textcolor=color.orange, style=label.style_label_left, xloc=xloc.bar_time)
-var labelTargetPriceSm = label.new(x=na, y=na, text="Sm= na", color=color.rgb(120, 123, 134, 90), textcolor=color.rgb(255, 82, 102), style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPriceY = label.new(x=na, y=na, text="Y= na", color=priceLabelColor, textcolor=color.blue, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPriceS = label.new(x=na, y=na, text="S= na", color=priceLabelColor, textcolor=color.orange, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPriceSm = label.new(x=na, y=na, text="Sm= na", color=priceLabelColor, textcolor=color.rgb(255, 82, 102), style=label.style_label_left, xloc=xloc.bar_time)
 
-var labelTargetPrice2E = label.new(x=na, y=na, text="2E: na", color=color.rgb(120, 123, 134, 90), textcolor=color.blue, style=label.style_label_left, xloc=xloc.bar_time)
-var labelTargetPrice2N = label.new(x=na, y=na, text="2N: na", color=color.rgb(120, 123, 134, 90), textcolor=color.orange, style=label.style_label_left, xloc=xloc.bar_time)
-var labelTargetPrice3E = label.new(x=na, y=na, text="3E: na", color=color.rgb(120, 123, 134, 90), textcolor=color.blue, style=label.style_label_left, xloc=xloc.bar_time)
-var labelTargetPrice3N = label.new(x=na, y=na, text="3N: na", color=color.rgb(120, 123, 134, 90), textcolor=color.orange, style=label.style_label_left, xloc=xloc.bar_time)
-var labelTargetPrice4E = label.new(x=na, y=na, text="4E: na", color=color.rgb(120, 123, 134, 90), textcolor=color.blue, style=label.style_label_left, xloc=xloc.bar_time)
-var labelTargetPrice4N = label.new(x=na, y=na, text="4N: na", color=color.rgb(120, 123, 134, 90), textcolor=color.orange, style=label.style_label_left, xloc=xloc.bar_time)
-var labelTargetPrice5E = label.new(x=na, y=na, text="4E: na", color=color.rgb(120, 123, 134, 90), textcolor=color.blue, style=label.style_label_left, xloc=xloc.bar_time)
-var labelTargetPrice5N = label.new(x=na, y=na, text="4N: na", color=color.rgb(120, 123, 134, 90), textcolor=color.orange, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPrice2E = label.new(x=na, y=na, text="2E: na", color=priceLabelColor, textcolor=color.blue, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPrice2N = label.new(x=na, y=na, text="2N: na", color=priceLabelColor, textcolor=color.orange, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPrice3E = label.new(x=na, y=na, text="3E: na", color=priceLabelColor, textcolor=color.blue, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPrice3N = label.new(x=na, y=na, text="3N: na", color=priceLabelColor, textcolor=color.orange, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPrice4E = label.new(x=na, y=na, text="4E: na", color=priceLabelColor, textcolor=color.blue, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPrice4N = label.new(x=na, y=na, text="4N: na", color=priceLabelColor, textcolor=color.orange, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPrice5E = label.new(x=na, y=na, text="4E: na", color=priceLabelColor, textcolor=color.blue, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPrice5N = label.new(x=na, y=na, text="4N: na", color=priceLabelColor, textcolor=color.orange, style=label.style_label_left, xloc=xloc.bar_time)
 
-var labelTargetPriceETop = label.new(x=na, y=na, text="Emax", color=color.rgb(120, 123, 134, 90), textcolor=ecol, style=label.style_label_left, xloc=xloc.bar_time)
-var labelTargetPriceEBot = label.new(x=na, y=na, text="Emin", color=color.rgb(120, 123, 134, 90), textcolor=ecol, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPriceETop = label.new(x=na, y=na, text="Emax", color=priceLabelColor, textcolor=ecol, style=label.style_label_left, xloc=xloc.bar_time)
+var labelTargetPriceEBot = label.new(x=na, y=na, text="Emin", color=priceLabelColor, textcolor=ecol, style=label.style_label_left, xloc=xloc.bar_time)
 var labelBeforeTargetETime = label.new(x=na, y=na, text="Test", color=color.rgb(0, 137, 123, 48), textcolor=color.rgb(255, 255, 255, 34), style=label.style_label_up, xloc=xloc.bar_time, size=size.small)
 var labelAfterTargetETime = label.new(x=na, y=na, text="Test", color=color.rgb(0, 137, 123, 48), textcolor=color.rgb(255, 255, 255, 34), style=label.style_label_up, xloc=xloc.bar_time, size=size.small)
 
@@ -214,35 +217,94 @@ var labelFiboTextColorNeg = color.rgb(0, 104, 93)
 var labelFiboTextColorNegCrash = color.red
 var labelFiboTextColorGoal = color.rgb(165, 209, 204)
 var labelFiboTextColorGold = color.rgb(255, 224, 71)
-var labelFibo0 = label.new(x=na, y=na, text="    0 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
-var labelFibo23 = label.new(x=na, y=na, text="23.6 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
-var labelFibo38 = label.new(x=na, y=na, text="38.2 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
-var labelFibo50 = label.new(x=na, y=na, text="50.0 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
-var labelFibo61 = label.new(x=na, y=na, text="61.8 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
-var labelFibo78 = label.new(x=na, y=na, text="78.8 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
-var labelFibo100 = label.new(x=na, y=na, text=" 100 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGoal, style=label.style_label_left, xloc=xloc.bar_time)
-var labelFibo123 = label.new(x=na, y=na, text=" 123 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGoal, style=label.style_label_left, xloc=xloc.bar_time)
-var labelFibo138 = label.new(x=na, y=na, text=" 138 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGoal, style=label.style_label_left, xloc=xloc.bar_time)
-var labelFibo161 = label.new(x=na, y=na, text=" 161 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGold, style=label.style_label_left, xloc=xloc.bar_time)
-var labelFibo178 = label.new(x=na, y=na, text=" 178 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGold, style=label.style_label_left, xloc=xloc.bar_time)
-var labelFibo200 = label.new(x=na, y=na, text=" 200 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorGold, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo0 = label.new(x=na, y=na, text="    0 %", color=transparent, textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo23 = label.new(x=na, y=na, text="23.6 %", color=transparent, textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo38 = label.new(x=na, y=na, text="38.2 %", color=transparent, textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo50 = label.new(x=na, y=na, text="50.0 %", color=transparent, textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo61 = label.new(x=na, y=na, text="61.8 %", color=transparent, textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo78 = label.new(x=na, y=na, text="78.8 %", color=transparent, textcolor = labelFiboTextColor, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo100 = label.new(x=na, y=na, text=" 100 %", color=transparent, textcolor = labelFiboTextColorGoal, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo123 = label.new(x=na, y=na, text=" 123 %", color=transparent, textcolor = labelFiboTextColorGoal, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo138 = label.new(x=na, y=na, text=" 138 %", color=transparent, textcolor = labelFiboTextColorGoal, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo161 = label.new(x=na, y=na, text=" 161 %", color=transparent, textcolor = labelFiboTextColorGold, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo178 = label.new(x=na, y=na, text=" 178 %", color=transparent, textcolor = labelFiboTextColorGold, style=label.style_label_left, xloc=xloc.bar_time)
+var labelFibo200 = label.new(x=na, y=na, text=" 200 %", color=transparent, textcolor = labelFiboTextColorGold, style=label.style_label_left, xloc=xloc.bar_time)
 
-var labelFiboN0 = label.new(x=na, y=na, text="-0 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
-var labelFiboN23 = label.new(x=na, y=na, text="-23.6 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
-var labelFiboN38 = label.new(x=na, y=na, text="-38.2 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
-var labelFiboN50 = label.new(x=na, y=na, text="-50.0 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
-var labelFiboN61 = label.new(x=na, y=na, text="-61.8 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
-var labelFiboN78 = label.new(x=na, y=na, text="-78.8 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
-var labelFiboN100 = label.new(x=na, y=na, text=" -100 %", color=color.rgb(120, 123, 134, 100), textcolor = labelFiboTextColorNegCrash, style=label.style_label_right, xloc=xloc.bar_time)
+var labelFiboN0 = label.new(x=na, y=na, text="-0 %", color=transparent, textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
+var labelFiboN23 = label.new(x=na, y=na, text="-23.6 %", color=transparent, textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
+var labelFiboN38 = label.new(x=na, y=na, text="-38.2 %", color=transparent, textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
+var labelFiboN50 = label.new(x=na, y=na, text="-50.0 %", color=transparent, textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
+var labelFiboN61 = label.new(x=na, y=na, text="-61.8 %", color=transparent, textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
+var labelFiboN78 = label.new(x=na, y=na, text="-78.8 %", color=transparent, textcolor = labelFiboTextColorNeg, style=label.style_label_right, xloc=xloc.bar_time)
+var labelFiboN100 = label.new(x=na, y=na, text=" -100 %", color=transparent, textcolor = labelFiboTextColorNegCrash, style=label.style_label_right, xloc=xloc.bar_time)
+
+color boxColor = #d21362
+
+drawTargetWindow(int time1, int time2, int time3, float bottomPrice, float topPrice) => 
+    log.info("TODO box")
+    log.info(str.tostring(time1) + " " + str.tostring(time3) + " " + str.tostring(bottomPrice) + " " + str.tostring(topPrice))
+    box.new(time1, topPrice, time3, bottomPrice, border_color = boxColor, border_width = 1, border_style = line.style_dashed, xloc=xloc.bar_time, bgcolor=color.rgb(0,0,0,100))
+    line.new(time2, topPrice, time2, bottomPrice, xloc=xloc.bar_time, color=boxColor, style=line.style_dashed, width = 1)
+
+drawStrengthArrow(int timeOrigin, float priceOrigin, int targetTime, float targetPrice, string bigram, color arrowColor, int time1, int time3) => 
+    log.info("TODO arrows")
+    line.new(timeOrigin, priceOrigin, targetTime, targetPrice, xloc = xloc.bar_time, color = arrowColor, style = line.style_arrow_right, width = 1)
+    line.new(time1, targetPrice, time3, targetPrice, xloc = xloc.bar_time, color=arrowColor, style=line.style_dotted, width=1)
+    label.new(time3, targetPrice, text=bigram + str.format(n4dig, targetPrice), xloc=xloc.bar_time, yloc=yloc.price, color=priceLabelColor, style=label.style_label_left, textcolor = arrowColor, size=size.normal)
+
+// Secondary Drawing function for extended features from BCD
+drawIndicatorEx(Wave t) =>
+    log.info("TODO ex")
+    // retracement
+    float retracement = math.abs((t.price3 - t.priceD) / (t.price3 - t.price2) * 100.0)
+    // wave types
+    bool nWave  = retracement <= pret ? true : false                                                                            // N Wave is a P Wave with less than 50% retracement (will tend to have E outside of BC)
+    bool pWave  = retracement > pret and retracement < 100.0 ? true : false                                                     // P Wave is an N Wave with more than 50% retracement (will tend to have E staying inside of BC)
+    bool sWave  = retracement >= 100.0 ? true : false                                                                           // S Wave is the premice of a Y Wave with more than 100% of retracement on BC
+    // compute strengths
+    float levelN = t.priceD + (t.price3 - t.price2)                                                                             // N:  
+    float levelE = (t.price3 - t.price2) + t.price3                                                                             // E:  CE = BC
+    float levelV = (t.price3 - t.priceD) + t.price3                                                                             // V:  DE = CD
+    float levelNt = (t.priceD - t.price2) + t.priceD                                                                            // Nt: DE = BD (need 33% retracement of CD over BC)
+    float levelP = (t.price2 - t.priceD) + t.price3                                                                             // P:  DE = C + (B - D)
+    float levelY = (t.price2 - t.priceD) + t.price3                                                                             // Y:  DE = C + (B - D)
+    float levelS = (t.price3 - t.price2) + t.priceD                                                                             // S:  DE = D + (C - B)
+    float levelSm = (0.5 * (t.price3 - t.priceD)) + t.priceD                                                                    // Sm: DE = D + ((C - D) / 2)
+
+    // compute polarity
+    bool negativity = t.price2 > t.price3                                                                                       // (C-B) < 0   (B is higher than C)
+    // compute timeEx1, timeEx2, timeEx3
+    int time2 = t.timeD + (t.time3 - t.time2)
+    int time1 = time2 - (t.time3 - t.time2) + candleTime
+    int time3 = time2 + (t.time3 - t.time2) - candleTime
+    // compute top and bottom
+    float levelTop = sWave ? levelY : levelE                                                                                    // Y if S-Wave or (E if N-Wave|P-Wave)
+    float levelBottom = t.priceD
+    // draw box and median time
+    drawTargetWindow(time1, time2, time3, levelBottom, levelTop)
+    // draw arrows, level, labels as one object call
+    if nWave
+        drawStrengthArrow(t.timeD, t.priceD, time2, levelN, "N= ", boxColor, time1, time3)
+        drawStrengthArrow(t.timeD, t.priceD, time2, levelE, "E= ", boxColor, time1, time3)
+        drawStrengthArrow(t.timeD, t.priceD, time2, levelV, "V= ", boxColor, time1, time3)
+        if pWave
+            drawStrengthArrow(t.timeD, t.priceD, time2, levelP, "P= ", boxColor, time1, time3)
+        else
+            drawStrengthArrow(t.timeD, t.priceD, time2, levelNt, "Nt= ", boxColor, time1, time3)
+
+    if sWave
+        drawStrengthArrow(t.timeD, t.priceD, time2, levelS, "S= ", boxColor, time1, time3)
+        drawStrengthArrow(t.timeD, t.priceD, time2, levelY, "Y= ", boxColor, time1, time3)
+        drawStrengthArrow(t.timeD, t.priceD, time2, levelSm, "Sm= ", boxColor, time1, time3)
 
 // Main Drawing function using Wave theory about N Waves with Undulatory by Hosoda
 drawIndicator(Wave t) =>
 
     if wavt
         // Wave lines, Box and Arrows
-        line.new(t.time1, t.price1, t.time2, t.price2, xloc = xloc.bar_time, color = wavc, width=wavw, style=lineStr2style(wavs))                                                                                                          // dotted impulse
-        line.new(t.time2, t.price2, t.time3, t.price3, xloc = xloc.bar_time, color = wavc, width=wavw, style=lineStr2style(wavs))                                                                                                          // dotted correction
-        line.new(t.time3, t.price3, t.timeD, t.priceD, xloc = xloc.bar_time, color = wavc, width=wavw, style=lineStr2style(wavs))                                                                                                          // dotted D wave
+        line.new(t.time1, t.price1, t.time2, t.price2, xloc = xloc.bar_time, color = wavc, width=wavw, style=lineStr2style(wavs))                                                                                   // dotted impulse
+        line.new(t.time2, t.price2, t.time3, t.price3, xloc = xloc.bar_time, color = wavc, width=wavw, style=lineStr2style(wavs))                                                                                   // dotted correction
+        line.new(t.time3, t.price3, t.timeD, t.priceD, xloc = xloc.bar_time, color = wavc, width=wavw, style=lineStr2style(wavs))                                                                                   // dotted D wave
 
     // Extends to deadline or time4
     int deadline = tim3 ? t.boxTime1 : t.time4
@@ -456,6 +518,10 @@ drawIndicator(Wave t) =>
             line.new(t.time1, t.price1, t.time3, t.price3, xloc=xloc.bar_time, color=tcol, style = line.style_solid, width=twid, extend = extend.both)
             line.new(t.time2, t.price2, t.timeD, t.priceD, xloc=xloc.bar_time, color=tcol, style = line.style_solid, width=twid, extend = extend.both)
 
+        // Extended strength arrows from BCD
+        if bcd4
+            drawIndicatorEx(t)
+
     // E-Box: If Point D has been placed after Point C, we have some prediction to make
     if ebox and t.timeD > t.time3
         box.new(t.boxTimeE0, t.boxPriceEBot, t.boxTimeE1, t.boxPriceETop, bgcolor = color.rgb(0,0,0,100), border_color = ecol, xloc = xloc.bar_time, border_width = 1)
@@ -500,7 +566,7 @@ drawIndicator(Wave t) =>
         int cd = t.timeDelta3 / candleTime
         int abc = ab + bc + 1
         int bcd = (t.timeD > t.time3) ? bc + cd + 1 : na
-        log.info(str.tostring(bcd))
+        // log.info(str.tostring(bcd))
         for i = array.size(naturalCycles) - 1 to 0
             if array.get(naturalCycles, i) == abc or array.get(naturalCycles, i) == bcd
                 corr := true
@@ -757,7 +823,7 @@ if barstate.islastconfirmedhistory
     wave.barWidthInPixels := math.abs(bar_index - bar_index[1])
     // log.info(str.format(n2dig, wave.retracement) + "% retracement, nWave is " + str.tostring(wave.nWave) + ", pWave is " + str.tostring(wave.pWave) + ", sWave is " + str.tostring(wave.sWave))
 
-    // arrows extended to deadline
+    // arrows extended to last deadline (TIME #3 aka boxTime1 in code)
     int exTime4 = wave.boxTime1 - wave.time3
     int time34 = wave.time4 - wave.time3
     wave.price4Ex := wave.price3 + ((wave.price4 - wave.price3) / time34) * exTime4                 // price4 aka N
