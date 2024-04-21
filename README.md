@@ -80,34 +80,47 @@ That hypothetical D pointed by the N arrow is at the **Target Time** (sometimes 
 
 The **Target Time** is in a window, a box, in which the value is supposed to evolve or solidify the current structure move. The left side of the box is time 1, and the middle dashed line is the time 2. Once the current bar gets inside, you know the time component of the action. Yet you'll have to discover the price it goes to. The duration of the window is inferred by the BC duration. The right side of the window (time 3) is usually the beginning of a new wave building up, or a continuation you had to confirm.
 
-A reddish dashed line named the **Correlation Line** is drawn away from BC, at the same distance from C. This dashed line is at a moment in time when you may want to check the rightness of the predictions. If the candles follow the arrows and dont change direction before this stage, the window is still a potential target for the N Wave. If the candles went completly elsewhere, you probably misplaced your ABC points. Or the market just went crazy, like it often does (sic). 
+The reddish dashed line can be called the **Taito Suchi Line** is drawn away from BC, at the same distance from C. This dashed line is at a moment in time when you may want to check the rightness of the predictions. If the candles follow the arrows and dont change direction before this stage, the window is still a potential target for the N Wave. If the candles went completly elsewhere, you probably misplaced your ABC points. Or the market just went crazy, like it often does (sic). 
 If the line is before or after time 2 by one period, you may determine a correlation with the Ichimoku numbers (ie. Kihon Suchi series).
 
 The indicator is helpful at the time it is drawn until the candles gets into the window. It wont move over time. Whatever the market is doing, once on the other side of the **Correlation Line**, this instance of the indicator becomes a thing of the past. If you made a plan using it, stick to the plan. And play it safe if the market tries something unexpected in that window. 
 
 The **E arrow** is what the market would have done if not stopped at B. But delayed by the BC time. 
 
-The **NT arrow** is almost the opposite, it's what the market would have done at the Target Time if the pressure had been the same between A and C. If C is lower than A, that differential is computed again. 
+The **NT arrow** is the AC differential from C. This arrow appear within an **N-Wave**. And need 33% of BC retracement to become relevant. 
 
-The **V arrow** is what the market would have done if the sign of BC had been reversed. 
+The **P arrow** is the AC differential from B. This arrow appear within an **N-Wave** in place of an **NT arrow** when BC retracement is above 50%.
 
-The indicator loses some of its relevance when the **Retracement BC** is lower than 33%.
+The **V arrow** is what the market would do to return to B. 
+
+The **S arrow** is displayed within a **Y-Wave** configuration. Meaning the market is en route for an expanding A/B/C/D. Higher highs and lower lows. As D is not realised yet, the indicator assumes the presence of an **S arrow** when BC retracement is above 100%. **Y arrow** and **Sm arrow** are also displayed. 
+
+The indicator loses some of its relevance when the **Retracement BC** is lower than 33% (are we in a range ?).
 Above that, arrows **N, V, E** and **NT** can still reveal potential targets.
 
 When the market is strongly bullish or bearish, it's not unusual to watch the price go crazy above or below the window. In such cases, the chart may follow a strength arrow that is a multiple of **E** or **N**. That's why this script has an option to display those multiples as new attractive targets. Take notes that 5E/5N are irrational targets.
+
+The **E-Box** is a potential timed window and a target area for the next correction after D. At the moment, the feature is unstable. It won't work well within a **P|S-Wave**. You need to place a **Point D** situated in time after **Point C**. Just move the point before or after C to toggle this feature (if enabled in the settings).
 
 The **SLP** stands for **Straight Linear Projection**. It's really just the direction the chart is heading into from the C point to now (now being the last confirmed bar). It has no real value. The calculated value shown in the purple label is the market price this chart would end up at if continuing in that direction, up to the **Target Time**.
 
 I also added a feature called **Tenkan Crossover Markers**. An arrow is displayed above bars when a Tenkan crossed over the Kijun. The numerical value indicate the number of bars since the last event of that kind occured on the left. When the tenkan is crossing over, it's often accompanied by a movement up or down of the price. It's a change in the structure itself. It's important to follow those crossovers. 
 
-The **Kihon Suchi** series describe a typical number of bars after which the Tenkan sen crosses over the Kijun sen. It's theory. And prone to errors by 2 due to the nature of bars in a timeframe. After the last crossing, one can expect to see the next one following that series. I added this indicator for fun. The dashed gold line is not on the series. It shows the bar in the future that correspond to the same cycle than the last one. The numbers of the series can be displayed at the bottom center of the chart. 
+The **Kihon Suchi** series represent times in ichimoku. One of these numbers can appear in many ways. 
+It can describe a typical number of bars after which the Tenkan sen crosses over the Kijun sen. It's theory. And prone to errors by 2 due to the nature of bars in a timeframe. After the last crossing, one can expect to see the next one following that series. I added this indicator for fun. The dashed gold line is not on the series. It shows the bar in the future that correspond to the same cycle than the last one. The numbers of the series can be displayed at the bottom center of the chart. 
+**Taito Suchi** is a situation where two waves have the same number of candles. Finding a Taito Suchi can indicate you found an interesting ABC. 
+D is probably going to occur on a Kihon Suchi period aswell, from C. The dashline we talked about before is a candidate (as its afar from C by the same periods than BC).
+
+I also gave you a **Fibonacci Axis** you can offset laterally on your chart in bar steps. It has two scales, one for a loss retracing B to A. And one for a gain from C to N. 
+If you enable the **C to N** feature, you'll have %gain in realtime displayed on the axis. It doesn't work well for non N-Wave structures yet.
 
 At the moment, this indicator is tedious to use on several charts at once : 
     - You may require one layout(tab) per chart. 
     - Switching between symbols is not working. 
     - I wish i could draw several instances of this indicator on one chart without any trouble. 
-    - Dont check every option at once, you'll lose elements past 50 ones on the chart per indicator. 
-I'm pretty sure you'll find a comfy way to use it anyhow. 
+    - Dont check every option at once, you'll lose elements past 150 elements on the chart per indicator. 
+    - The indicator takes some time to load (the first time), wait for the blue notification asking to place Point A before clicking on something else.
+Even imperfect, i'm pretty sure you'll find a comfy way to use it anyhow. 
 
 
 ## F.A.Q.
@@ -122,7 +135,7 @@ I did, and it lasted 24 hours, after which a moderator kicked me for breaching t
 
     What made you choose the N Wave as a subject for this exercise ?
 
-I watched a presentation on Twitch about the undulatory theory of Hosoda. The streamer used a private indicator, apparently very simple but behind a paywall or something restricting. I found that weird as the indicator is so simple to reverse engineer. So i did. I may have stolen the color grading since i followed a screenshot of the stream. This streamer also had other options and more variant of the tool in his arsenal. I'm way out of my league and i'm not inclined to copycat everything he does. But that's inspiring. 
+I watched a presentation on Twitch about the undulatory theory of Hosoda. The streamer (ZSTrader) used a private indicator, apparently very simple but behind a paywall or something restricting. I found that weird as the indicator is so simple to reverse engineer. So i did. I may have stolen the color grading since i followed a screenshot of the stream. This streamer also had other options and more variants of the tool in his arsenal. I'm way out of my league and i'm not inclined to copycat everything he does. But that's inspiring. 
 
     Are you going to update this indicator in the future ? Or make new ones ?
 
@@ -145,7 +158,7 @@ No. Probably not. I'll get bored very quickly on that subject.
 
         - Trading Ichimoku Kinko Hyo Three Roles With Wave, Price, & Time Theories [https://www.youtube.com/watch?v=CIjWEsr0Cgo]
 
-    - ZS Trader's Masterclasses (French)
+    - ZSTrader's Masterclasses (French)
 
         - On youtube [https://www.youtube.com/@cryptologik-live/videos]
         - On twitch on tuesdays [https://www.twitch.tv/cryptologikfr]

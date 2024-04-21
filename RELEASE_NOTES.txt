@@ -1,8 +1,22 @@
 VERSION HISTORY
 
+    v0.9.5 - 04-21-2024
+
+        - added labels on fibo axis following the price and giving %gain on C to N (won't matter on other structures than N-Waves yet)
+        - added Taito Suchi indicator
+            o added Correlation to Ichimoku numbers (+1/-1 of any Kihon Suchi number, or natural in 26 periods) as bottom right box message
+            o added a box message in top right corner if ab = bc or bc = cd showing the current measured taito suchi period
+        - added an option to extend arrows to the end of the target window
+        - added an option to compute strength arrows from BCD given D is after C and legit
+        - added an option to change the style of the link between A/B/C/D
+        - fixed the labels around the E-Box
+        - improved some parts of the code (started coding object factories, added string and color constants)
+        - improved the correction prediction for E-Box (still bugged in several cases)
+        - improved the documentation
+
     v0.9.4 - 04-06-2024
 
-        - added the case of A/B/C is the beginning of an S-Wave (more than 100% of BC retracement over AB)
+        - added the case when A/B/C is the beginning of an S-Wave (more than 100% of BC retracement over AB)
         - added P Target as B + (A - C), instead of an Nt one, displayed when having a P-Wave structure using A/B/C/D (>50% retracement)
         - added an option to specify the % of retracement needed for a P-Wave (N-Wave and P-Wave have a blurry area)
         - added a box to point E based on CLogik's approach using a potentially realised D point : 
