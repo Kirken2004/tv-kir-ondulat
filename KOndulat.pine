@@ -1,7 +1,7 @@
 //@version=5
 indicator("Kir Ondulatoire", shorttitle="KOndulat", overlay=true, max_labels_count = 150)
 
-    // version 0.9.4
+    // version 0.9.5
 
     // Copyright (C) 2024  Kir (https://github.com/Kirken2004/tv-kir-ondulat)
 
@@ -38,9 +38,9 @@ wavs = input.string(defval="dotted", title=" ", inline="option0", group="Wave op
 pret = input.float(defval=50.0, title="% Retracement for a P-Wave", inline="option1", group="Wave options", tooltip="By default, a P wave is forming if the move BC retraced more than 50% of AB. N waves are more certain between 33% and 50%. Alter this if you think the situation is blurry.")
 mult = input.bool(defval=false, title="Multiples of E/N waves", inline="option2", group="Wave options", tooltip="Won't work in case of an S-Wave.")
 tim3 = input.bool(defval=false, title="Extend to deadline", inline="option2b", group="Wave options", tooltip="Extend the strength lines to the end of the target period (aka TIME #3).")
-ebox = input.bool(defval=true, title="E-Box", inline="option3", group="Wave options")
-ecol = input.color(defval=color.aqua, title=" ", inline="option3", group="Wave options")
-bcd4 = input.bool(defval=false, title="Extend from BCD", inline="option3", group="Wave options", tooltip="E-Box\nNeed the point D to be placed after time C [STILL BUGGED AT THE MOMENT].\n\nBCD\nDraw new strength lines from D if placed after time C.")
+bcd4 = input.bool(defval=false, title="Project from BCD", inline="option3", group="Wave options", tooltip="BCD\nDraw new strength lines from D if placed after time C. Should be used when you are almost certain D is realised.")
+ebox = input.bool(defval=true, title="Expected correction (E-Box)", inline="option3b", group="Wave options")
+ecol = input.color(defval=color.aqua, title=" ", inline="option3b", group="Wave options", tooltip="E-Box\nNeed the point D to be placed after time C [STILL BUGGED AT THE MOMENT]. The drawn box indicates where and when a correction is expected. Can even be used if you are not sure about D.")
 tend = input.bool(defval=false, title="Straight Linear Projection", inline="option4", group="Wave options", tooltip="SLP: As long as the TARGET TIME is not reached, a purple arrow will point to the target. A purple label will give the estimated target price. It's a silly feature.")
 labp = input.bool(defval=false, title="Price in labels", inline="option5", group="Wave options")
 tren = input.bool(defval=false, title="Wave Trend Lines", inline="option6", group="Wave options", tooltip = "Only visibles if D label is also visible. Help to visually confirm if ABCD is an N/Y/P wave.")
@@ -60,7 +60,7 @@ tasu = input.bool(defval=true, title="Taito Suchi or any correlation", inline="o
 ac26 = input.bool(defval=false, title="26 periods after A/C", inline="option1", group="Miscellaneous options", tooltip = "The Kumo cloud between those two deadlines gives an active area to keep an eye on. Up to you to draw a bounding box there.")
 dema = input.bool(defval=false, title="EMA", inline="option2", group="Miscellaneous options")
 fibo = input.bool(defval=false, title="Fibonacci Axis", inline="option3", group="Miscellaneous options")
-cton = input.bool(defval=false, title="C to N", inline="option3", group="Miscellaneous options", tooltip="C to N: Gives you the expected pluvalue from C to N, then the realised ratio.\nN/AB gives you the current position on the fibo axis. To N when in continuation, to AB when retracing C.")
+cton = input.bool(defval=false, title="C to N/S", inline="option3", group="Miscellaneous options", tooltip="C to N/S: Gives you the expected pluvalue from C to N, then the realised ratio.\nN/AB gives you the current position on the fibo axis. To N/S when in continuation, to AB when retracing C.")
 
 int realtimeTime = 1
 float realtimePrice = 1.0
@@ -241,20 +241,16 @@ var labelFiboN100 = label.new(x=na, y=na, text=" -100 %", color=transparent, tex
 color boxColor = #d21362
 
 drawTargetWindow(int time1, int time2, int time3, float bottomPrice, float topPrice) => 
-    log.info("TODO box")
-    log.info(str.tostring(time1) + " " + str.tostring(time3) + " " + str.tostring(bottomPrice) + " " + str.tostring(topPrice))
-    box.new(time1, topPrice, time3, bottomPrice, border_color = boxColor, border_width = 1, border_style = line.style_dashed, xloc=xloc.bar_time, bgcolor=color.rgb(0,0,0,100))
-    line.new(time2, topPrice, time2, bottomPrice, xloc=xloc.bar_time, color=boxColor, style=line.style_dashed, width = 1)
+    box.new(time1, topPrice, time3, bottomPrice, border_color = boxColor, border_width = 1, border_style = line.style_dotted, xloc=xloc.bar_time, bgcolor=transparent)
+    line.new(time2, topPrice, time2, bottomPrice, xloc=xloc.bar_time, color=boxColor, style=line.style_dotted, width = 1)
 
 drawStrengthArrow(int timeOrigin, float priceOrigin, int targetTime, float targetPrice, string bigram, color arrowColor, int time1, int time3) => 
-    log.info("TODO arrows")
     line.new(timeOrigin, priceOrigin, targetTime, targetPrice, xloc = xloc.bar_time, color = arrowColor, style = line.style_arrow_right, width = 1)
     line.new(time1, targetPrice, time3, targetPrice, xloc = xloc.bar_time, color=arrowColor, style=line.style_dotted, width=1)
-    label.new(time3, targetPrice, text=bigram + str.format(n4dig, targetPrice), xloc=xloc.bar_time, yloc=yloc.price, color=priceLabelColor, style=label.style_label_left, textcolor = arrowColor, size=size.normal)
+    label.new(time3, targetPrice, text=bigram + str.format(n4dig, targetPrice), xloc=xloc.bar_time, yloc=yloc.price, color=priceLabelColor, style=label.style_label_left, textcolor = arrowColor, size=size.small)
 
 // Secondary Drawing function for extended features from BCD
 drawIndicatorEx(Wave t) =>
-    log.info("TODO ex")
     // retracement
     float retracement = math.abs((t.price3 - t.priceD) / (t.price3 - t.price2) * 100.0)
     // wave types
@@ -275,8 +271,8 @@ drawIndicatorEx(Wave t) =>
     bool negativity = t.price2 > t.price3                                                                                       // (C-B) < 0   (B is higher than C)
     // compute timeEx1, timeEx2, timeEx3
     int time2 = t.timeD + (t.time3 - t.time2)
-    int time1 = time2 - (t.time3 - t.time2) + candleTime
-    int time3 = time2 + (t.time3 - t.time2) - candleTime
+    int time1 = time2 - (t.time3 - t.time2 - candleTime)
+    int time3 = time2 + (t.time3 - t.time2 - candleTime)
     // compute top and bottom
     float levelTop = sWave ? levelY : levelE                                                                                    // Y if S-Wave or (E if N-Wave|P-Wave)
     float levelBottom = t.priceD
@@ -284,18 +280,18 @@ drawIndicatorEx(Wave t) =>
     drawTargetWindow(time1, time2, time3, levelBottom, levelTop)
     // draw arrows, level, labels as one object call
     if nWave
-        drawStrengthArrow(t.timeD, t.priceD, time2, levelN, "N= ", boxColor, time1, time3)
-        drawStrengthArrow(t.timeD, t.priceD, time2, levelE, "E= ", boxColor, time1, time3)
-        drawStrengthArrow(t.timeD, t.priceD, time2, levelV, "V= ", boxColor, time1, time3)
+        drawStrengthArrow(t.timeD, t.priceD, time2, levelN, "N= ", t.arrowColorNS, time1, time3)
+        drawStrengthArrow(t.timeD, t.priceD, time2, levelE, "E= ", t.arrowColorEY, time1, time3)
+        drawStrengthArrow(t.timeD, t.priceD, time2, levelV, "V= ", t.arrowColorVSm, time1, time3)
         if pWave
-            drawStrengthArrow(t.timeD, t.priceD, time2, levelP, "P= ", boxColor, time1, time3)
+            drawStrengthArrow(t.timeD, t.priceD, time2, levelP, "P= ", t.arrowColorNtP, time1, time3)
         else
-            drawStrengthArrow(t.timeD, t.priceD, time2, levelNt, "Nt= ", boxColor, time1, time3)
+            drawStrengthArrow(t.timeD, t.priceD, time2, levelNt, "Nt= ", t.arrowColorNtP, time1, time3)
 
     if sWave
-        drawStrengthArrow(t.timeD, t.priceD, time2, levelS, "S= ", boxColor, time1, time3)
-        drawStrengthArrow(t.timeD, t.priceD, time2, levelY, "Y= ", boxColor, time1, time3)
-        drawStrengthArrow(t.timeD, t.priceD, time2, levelSm, "Sm= ", boxColor, time1, time3)
+        drawStrengthArrow(t.timeD, t.priceD, time2, levelS, "S= ", t.arrowColorNS, time1, time3)
+        drawStrengthArrow(t.timeD, t.priceD, time2, levelY, "Y= ", t.arrowColorEY, time1, time3)
+        drawStrengthArrow(t.timeD, t.priceD, time2, levelSm, "Sm= ", t.arrowColorVSm, time1, time3)
 
 // Main Drawing function using Wave theory about N Waves with Undulatory by Hosoda
 drawIndicator(Wave t) =>
@@ -588,7 +584,7 @@ drawIndicator(Wave t) =>
         color colCorr = corr ? color.lime : color.red
         table.cell(tabCorr, 0, 0, txtCorr, 10, 3, text_color = color.white, text_size = size.small, bgcolor = colCorr)
         if ab == bc or bc == cd
-            table.cell(tabTasu, 0, 0, "Taito Suchi", 5, 3, text_color = color.yellow, text_size = size.small, bgcolor = color.maroon)
+            table.cell(tabTasu, 0, 0, "Taito Suchi of " + str.tostring(ab==bc ? ab : bc), 5, 3, text_color = color.yellow, text_size = size.small, bgcolor = color.maroon)
 
     if fibo
         var offsetXFiboM = (candleTime * fiboBarOffset) + t.time2
@@ -686,7 +682,7 @@ drawCtoN(Wave t) =>
         ratioNAB := t.baNegative ? -100.0 * math.abs((t.price2-t.currentPrice)/(t.price1-t.price2)) : 100.0 * math.abs((t.currentPrice-t.price3)/(t.price4-t.price3))
     else
         ratioNAB := t.baNegative ? 100.0 * math.abs((t.currentPrice-t.price3)/(t.price4-t.price3)) : -100.0 * math.abs((t.price2-t.currentPrice)/(t.price1-t.price2))
-    string sratioN = '100% = ' + (ratioN < 0 ? '': '+') + str.format(n2dig, ratioN) + ' % C TO N'
+    string sratioN = '100% = ' + (ratioN < 0 ? '': '+') + str.format(n2dig, ratioN) + ' % C TO N/S'
     string sratioC = (ratioC < 0 ? '': '+') + str.format(n2dig, ratioC) + ' %'
     string sratioNAB = (ratioNAB < 0 ? '' : '+') + str.format(n2dig, ratioNAB) + ' %'
     label.new(offsetXFiboM, t.price4, sratioN, xloc.bar_time, yloc.price, color.rgb(255, 153, 0), label.style_label_left, color.rgb(0, 0, 0), size.normal, text.align_center, '', font.family_monospace)
