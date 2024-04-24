@@ -10,6 +10,7 @@ VERSION HISTORY
         - added an option to compute strength arrows from BCD given D is after C and legit
         - added an option to change the style of the link between A/B/C/D
         - fixed the labels around the E-Box
+        - fixed a bug with P-Wave using BCD projection
         - improved some parts of the code (started coding object factories, added string and color constants)
         - improved the correction prediction for E-Box (still bugged in several cases)
         - improved the documentation
