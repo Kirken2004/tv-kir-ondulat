@@ -279,7 +279,7 @@ drawIndicatorEx(Wave t) =>
     // draw box and median time
     drawTargetWindow(time1, time2, time3, levelBottom, levelTop)
     // draw arrows, level, labels as one object call
-    if nWave
+    if nWave or pWave
         drawStrengthArrow(t.timeD, t.priceD, time2, levelN, "N= ", t.arrowColorNS, time1, time3)
         drawStrengthArrow(t.timeD, t.priceD, time2, levelE, "E= ", t.arrowColorEY, time1, time3)
         drawStrengthArrow(t.timeD, t.priceD, time2, levelV, "V= ", t.arrowColorVSm, time1, time3)
