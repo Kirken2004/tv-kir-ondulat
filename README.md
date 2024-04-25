@@ -116,11 +116,14 @@ I also gave you a **Fibonacci Axis** you can offset laterally on your chart in b
 If you enable the **C to N** feature, you'll have %gain in realtime displayed on the axis. It doesn't work well for non N-Wave structures yet.
 
 At the moment, this indicator is tedious to use on several charts at once : 
+
     - You may require one layout(tab) per chart. 
     - Switching between symbols is not working. 
     - I wish i could draw several instances of this indicator on one chart without any trouble. 
     - Dont check every option at once, you'll lose elements past 150 elements on the chart per indicator. 
-    - The indicator takes some time to load (the first time), wait for the blue notification asking to place Point A before clicking on something else.
+    - The indicator takes some time to load (the first time), 
+    - wait for the blue notification asking to place Point A before clicking on something else.
+    
 Even imperfect, i'm pretty sure you'll find a comfy way to use it anyhow. 
 
 
