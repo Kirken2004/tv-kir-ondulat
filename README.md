@@ -63,9 +63,10 @@ The actual code is very procedural and has many duplicated stuff.
     - Click "Save"
     - You may have to remove the indicator from the currently displayed chart
     - Click on "Indicators" and look for the saved indicator (you chose the name)
-    - On activation, it asks for three points A, B and C. (choose and click 3 times)
+    - On activation, it asks for four points A, B, C and D. (choose and click 4 times)
+    - If you dont need D, you can place it under C or before C (same behavior)
     - Open the "Settings" of the indicator in the top left area of the chart
-    - You may check some options if needed
+    - You may want to check some options when needed
 
 
 ## Usage
