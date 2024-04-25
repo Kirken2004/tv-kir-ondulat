@@ -2,6 +2,7 @@ VERSION HISTORY
 
     v0.9.7 - 04-26-2024
         - fixed S-Wave correction box as a retracement box based on half-BC instead of half-AD
+        - fixed a bug that prevented the user to change colors of plots in the style settings
         - removed a small bug with N-Wave correction box (was not always positionned on half-AD)
         - added level S/Y/Sm and P/Nt as offset levels for the calculus of the correction box
         - added a fillColor to the timed windows (aid visualize them on overlaps)

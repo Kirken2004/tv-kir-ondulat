@@ -405,9 +405,8 @@ drawIndicator(Wave t) =>
     // E-Box: If Point D has been placed after Point C, we have some prediction to make
     if ebox and t.timeD > t.time3
         box.new(t.boxTimeE0, t.boxPriceEBot, t.boxTimeE1, t.boxPriceETop, bgcolor = veilColor, border_color = ecol, xloc = xloc.bar_time, border_width = 1)
-        color ecolLight = color.new(ecol, 5)
-        line.new(t.timeD, t.priceD, t.boxTimeE0, t.boxPriceEAnchor, xloc=xloc.bar_time, color=ecolLight, style = line.style_arrow_right, width=1)
-        line.new(t.timeD, t.priceD, t.boxTimeE1, t.boxPriceEAnchor, xloc=xloc.bar_time, color=ecolLight, style = line.style_arrow_right, width=1)
+        line.new(t.timeD, t.priceD, t.boxTimeE0, t.boxPriceEAnchor, xloc=xloc.bar_time, color=ecol, style = line.style_arrow_right, width=1)
+        line.new(t.timeD, t.priceD, t.boxTimeE1, t.boxPriceEAnchor, xloc=xloc.bar_time, color=ecol, style = line.style_arrow_right, width=1)
         drawArrowLabel(t.boxTimeE1, t.boxPriceETop, str.format(n4dig, t.boxPriceETop), ecol)
         drawArrowLabel(t.boxTimeE1, t.boxPriceEBot, str.format(n4dig, t.boxPriceEBot), ecol)
         drawTimeLabel(t.boxTimeE0, t.boxPriceELabels, str.format_time(t.boxTimeE0, stamp, "UTC+" + str.tostring(timeZone)), transpTimeColor, transpWhiteColor, t.priceD < t.boxPriceELabels ? label.style_label_down : label.style_label_up)
