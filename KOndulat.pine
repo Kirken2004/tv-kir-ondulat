@@ -729,8 +729,8 @@ if barstate.islast
         table.cell(tabKisu, 0, 0, "Kihon Suchi 9, 17, 26, 33, 42, 51, 65, 76,,,", 17, 3, text_color = color.yellow, text_size = size.small, bgcolor = color.rgb(61, 61, 61))
 
 // Ichimoku stuff
-plot(ichi ? conversionLine : na, color=#4385ff, title="Tekan Conversion Line")                                        // TENKAN SEN
-plot(ichi ? baseLine : na, color=#f83737, title="Kijun Base Line")                                                    // KIJUN SEN
+plot(ichi ? conversionLine : na, color=#4385ff, title="Tekan Conversion Line", linewidth=2)                                        // TENKAN SEN
+plot(ichi ? baseLine : na, color=#f83737, title="Kijun Base Line", linewidth=2)                                                    // KIJUN SEN
 plot(ichi ? close : na, offset = -displacement + 1, color=#43A047, title="Lagging Chikou Span")
 p1 = plot(ichi ? leadLine1 : na, offset = displacement - 1, color=#A5D6A7, title="Leading Senkou Span A")
 p2 = plot(ichi ? leadLine2 : na, offset = displacement - 1, color=#EF9A9A, title="Leading Senkou Span B")
