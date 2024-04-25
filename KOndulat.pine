@@ -1,7 +1,7 @@
 //@version=5
 indicator("Kir Ondulatoire", shorttitle="KOndulat", overlay=true, max_labels_count=150, max_lines_count=100)
 
-    // version 0.9.6
+    // version 0.9.7
 
     // Copyright (C) 2024  Kir (https://github.com/Kirken2004/tv-kir-ondulat)
 
@@ -80,6 +80,7 @@ string stamp = 'dd-MMM-yyyy\nHH:mm:ss'
 color priceLabelBgColor = color.rgb(120, 123, 134, 90)
 color transparent = color.rgb(0, 0, 0, 100)
 color boxColorBCD = color.rgb(210, 19, 98)
+color veilColor = color.rgb(255,255,255,98)
 color arrowColorNS = color.orange
 color arrowColorEY = color.blue
 color arrowColorVSm = color.rgb(255, 82, 102)
@@ -145,7 +146,6 @@ type Wave
     float currentPrice
     float midADPrice
     int   currentTime
-    int   barWidthInPixels
     bool  baNegative
     bool  nWave
     bool  pWave
@@ -205,7 +205,7 @@ drawArrowLabel(int zeTime, float zePrice, string zeText, color txColor) =>
     label.new(x=zeTime, y=zePrice, text=zeText, xloc=xloc.bar_time, yloc=yloc.price, color=priceLabelBgColor, style=label.style_label_left, textcolor=txColor)
 
 drawTargetWindow(int time1, int time2, int time3, float bottomPrice, float topPrice) => 
-    box.new(time1, topPrice, time3, bottomPrice, border_color = boxColorBCD, border_width = 1, border_style = line.style_dotted, xloc=xloc.bar_time, bgcolor=transparent)
+    box.new(time1, topPrice, time3, bottomPrice, border_color = boxColorBCD, border_width = 1, border_style = line.style_dotted, xloc=xloc.bar_time, bgcolor=veilColor)
     line.new(time2, topPrice, time2, bottomPrice, xloc=xloc.bar_time, color=boxColorBCD, style=line.style_dotted, width = 1)
 
 drawStrengthArrow(int timeOrigin, float priceOrigin, int targetTime, float targetPrice, string bigram, color arrowColor, int time1, int time3) => 
@@ -326,7 +326,7 @@ drawIndicator(Wave t) =>
 
     line.new(t.time3 + t.timeDelta2, t.price3, t.time3 + t.timeDelta2, t.boxTopPrice, xloc = xloc.bar_time, color = arrowColorVSm, width=1, style=line.style_dashed)                                              // dashed at double correction time
 
-    box.new(t.boxTime0, t.boxTopPrice, t.boxTime1, t.price3, border_color = color.teal, border_width = 1, border_style = line.style_solid, bgcolor = na, xloc=xloc.bar_time)                                        // target box deadline
+    box.new(t.boxTime0, t.boxTopPrice, t.boxTime1, t.price3, border_color = color.teal, border_width = 1, border_style = line.style_solid, bgcolor = veilColor, xloc=xloc.bar_time)                                        // target box deadline
     line.new(t.time3 + t.timeDelta1, t.boxTopPrice, t.time3 + t.timeDelta1, t.price3, xloc=xloc.bar_time, style = line.style_dashed, width = 1, color=color.teal)                                                   // target dashed dateline
 
     // toggle the direction of things considering the relation between time A and time B
@@ -404,9 +404,10 @@ drawIndicator(Wave t) =>
 
     // E-Box: If Point D has been placed after Point C, we have some prediction to make
     if ebox and t.timeD > t.time3
-        box.new(t.boxTimeE0, t.boxPriceEBot, t.boxTimeE1, t.boxPriceETop, bgcolor = color.rgb(0,0,0,100), border_color = ecol, xloc = xloc.bar_time, border_width = 1)
-        line.new(t.timeD, t.priceD, t.boxTimeE0, t.boxPriceEAnchor, xloc=xloc.bar_time, color=ecol, style = line.style_arrow_right, width=1)
-        line.new(t.timeD, t.priceD, t.boxTimeE1, t.boxPriceEAnchor, xloc=xloc.bar_time, color=ecol, style = line.style_arrow_right, width=1)
+        box.new(t.boxTimeE0, t.boxPriceEBot, t.boxTimeE1, t.boxPriceETop, bgcolor = veilColor, border_color = ecol, xloc = xloc.bar_time, border_width = 1)
+        color ecolLight = color.new(ecol, 5)
+        line.new(t.timeD, t.priceD, t.boxTimeE0, t.boxPriceEAnchor, xloc=xloc.bar_time, color=ecolLight, style = line.style_arrow_right, width=1)
+        line.new(t.timeD, t.priceD, t.boxTimeE1, t.boxPriceEAnchor, xloc=xloc.bar_time, color=ecolLight, style = line.style_arrow_right, width=1)
         drawArrowLabel(t.boxTimeE1, t.boxPriceETop, str.format(n4dig, t.boxPriceETop), ecol)
         drawArrowLabel(t.boxTimeE1, t.boxPriceEBot, str.format(n4dig, t.boxPriceEBot), ecol)
         drawTimeLabel(t.boxTimeE0, t.boxPriceELabels, str.format_time(t.boxTimeE0, stamp, "UTC+" + str.tostring(timeZone)), transpTimeColor, transpWhiteColor, t.priceD < t.boxPriceELabels ? label.style_label_down : label.style_label_up)
@@ -596,9 +597,29 @@ if barstate.isrealtime and not barstate.isconfirmed
     if tend and wave.time4 > wave.currentTime
         drawSLP(wave)
 
-closestLevel(bool baNegative, float d, float n, float e, float n2, float e2, float n3, float e3, float n4, float e4) => 
+closestLevelS(bool baNegative, float d, float sm, float s, float y) => 
     float level = 0
     if baNegative == false
+        if d>sm
+            level := d-sm
+        if d>s
+            level := d-s
+        if d>y
+            level := d-y
+    if baNegative
+        if d<sm
+            level := sm-d
+        if d<s
+            level := s-d
+        if d<y
+            level := y-d
+    level
+
+closestLevelN(bool baNegative, float d, float ntp, float n, float e, float n2, float e2, float n3, float e3, float n4, float e4) => 
+    float level = 0
+    if baNegative == false
+        if d>ntp
+            level := d-ntp
         if d>n
             level := d-n
         if d>e
@@ -616,6 +637,8 @@ closestLevel(bool baNegative, float d, float n, float e, float n2, float e2, flo
         if d>e4
             level := d-e4
     if baNegative
+        if d<ntp
+            level := ntp-d
         if d<n
             level := n-d
         if d<e
@@ -673,18 +696,19 @@ if barstate.islastconfirmedhistory
     wave.boxTopPrice3 := 3 * (wave.price4 - wave.price3) + (wave.boxTopPrice - wave.price4) + wave.price3
     wave.boxTopPrice4 := 4 * (wave.price4 - wave.price3) + (wave.boxTopPrice - wave.price4) + wave.price3
     wave.boxTopPrice5 := 5 * (wave.price4 - wave.price3) + (wave.boxTopPrice - wave.price4) + wave.price3
-    float halfADPrice = 0.5 * (math.max(wave.price1, wave.price2, wave.price3, wave.priceD) - math.min(wave.price1, wave.price2, wave.price3, wave.priceD))   // ABCD median (relative)
-    wave.midADPrice := wave.baNegative ? wave.price1 - halfADPrice : wave.price1 + halfADPrice                                                                // ABCD mid point (absolute)
-    // log.info(str.format(n4dig, wave.midADPrice))
+    float halfADPriceN = 0.5 * (math.max(wave.price1, wave.price2, wave.price3, wave.priceD) - math.min(wave.price1, wave.price2, wave.price3, wave.priceD))                                    // ABCD median (relative) for N
+    float halfADPriceS = 0.5 * (math.max(wave.price3, wave.priceD) - math.min(wave.price3, wave.priceD))                                                                                        // CD median (relative) for S
+    wave.midADPrice := wave.sWave ? (wave.baNegative ? wave.price3 - halfADPriceS : wave.price3 + halfADPriceS) : (wave.baNegative ? wave.price1 - halfADPriceN : wave.price1 + halfADPriceN)   // ABCD/CD mid point (absolute) for N or for S
     wave.boxPriceEBot := wave.midADPrice
     float deltaEN = wave.boxTopPrice - wave.price4
-    wave.boxPriceETop := wave.boxPriceEBot + closestLevel(wave.baNegative, wave.priceD, wave.price4, wave.boxTopPrice, wave.boxTopPrice2 - deltaEN, wave.boxTopPrice2, wave.boxTopPrice3 - deltaEN, wave.boxTopPrice3, wave.boxTopPrice4 - deltaEN, wave.boxTopPrice4)
+    if wave.sWave
+        wave.boxPriceETop := wave.boxPriceEBot + closestLevelS(wave.baNegative, wave.priceD, wave.boxSmPrice, wave.boxSPrice, wave.boxYPrice)
+    else
+        wave.boxPriceETop := wave.boxPriceEBot + closestLevelN(wave.baNegative, wave.priceD, (wave.pWave ? wave.boxPPrice : wave.boxNtPrice), wave.price4, wave.boxTopPrice, wave.boxTopPrice2 - deltaEN, wave.boxTopPrice2, wave.boxTopPrice3 - deltaEN, wave.boxTopPrice3, wave.boxTopPrice4 - deltaEN, wave.boxTopPrice4)
     wave.boxTimeE0 := (wave.timeD - wave.time3) + wave.timeD
     wave.boxTimeE1 := (wave.timeD - wave.time1) + wave.timeD
     wave.boxPriceEAnchor := wave.baNegative ? wave.priceD + math.min(wave.boxPriceEBot - wave.priceD, wave.boxPriceETop - wave.priceD) : wave.priceD + math.max(wave.boxPriceEBot - wave.priceD, wave.boxPriceETop - wave.priceD)
     wave.boxPriceELabels := wave.baNegative ? wave.priceD + math.max(wave.boxPriceEBot - wave.priceD, wave.boxPriceETop - wave.priceD) : wave.priceD + math.min(wave.boxPriceEBot - wave.priceD, wave.boxPriceETop - wave.priceD)
-    wave.barWidthInPixels := math.abs(bar_index - bar_index[1])
-    // log.info(str.format(n2dig, wave.retracement) + "% retracement, nWave is " + str.tostring(wave.nWave) + ", pWave is " + str.tostring(wave.pWave) + ", sWave is " + str.tostring(wave.sWave))
 
     // arrows extended to last deadline (TIME #3 aka boxTime1 in code)
     int exTime4 = wave.boxTime1 - wave.time3

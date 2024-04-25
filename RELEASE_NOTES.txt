@@ -1,5 +1,11 @@
 VERSION HISTORY
 
+    v0.9.7 - 04-26-2024
+        - fixed S-Wave correction box as a retracement box based on half-BC instead of half-AD
+        - removed a small bug with N-Wave correction box (was not always positionned on half-AD)
+        - added level S/Y/Sm and P/Nt as offset levels for the calculus of the correction box
+        - added a fillColor to the timed windows (aid visualize them on overlaps)
+
     v0.9.6 - 04-25-2024
 
         - added an upper limit for drawn lines at a fixed amount of 100 (was 50)
