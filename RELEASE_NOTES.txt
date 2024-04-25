@@ -1,5 +1,13 @@
 VERSION HISTORY
 
+    v0.9.6 - 04-25-2024
+
+        - added an upper limit for drawn lines at a fixed amount of 100 (was 50)
+        - added factory function to manage the drawing of arrows, boxes, labels and arrows
+        - removed unused variables
+        - improved the code to drastically reduce the repetition of statements
+        - reduced the memory footprint by 15%
+    
     v0.9.5 - 04-21-2024
 
         - added labels on fibo axis following the price and giving %gain on C to N (won't matter on other structures than N-Waves yet)
