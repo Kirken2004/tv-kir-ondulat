@@ -53,8 +53,9 @@ maxl = input.int(10, minval=1, title=" up to", inline="option2", group="Ichimoku
 
 ksof = input.int(defval=0, title="Bar Offset", inline="option1", group="Kihon Suchi options")
 ksmx = input.int(defval=42, title="Max period", inline="option1", group="Kihon Suchi options", tooltip = "Won't draw Ichimoku times after this elapsed period")
-kisu = input.bool(defval=false, title="from last Crossover", inline="option2", group="Kihon Suchi options", tooltip = "Need Tenkan crossovers to be displayed to work.")
-ksob = input.bool(defval=false, title="from B", inline="option2", group="Kihon Suchi options", tooltip = "Won't work if previous option is checked.")
+kisu = input.bool(defval=false, title="from last Crossover", inline="option2", group="Kihon Suchi options")
+ksob = input.bool(defval=false, title="from B", inline="option2", group="Kihon Suchi options")
+ksoc = input.bool(defval=false, title="from C", inline="option2", group="Kihon Suchi options", tooltip = "Cannot be 'from B' and 'from C' at the same time. Wont work either with 'from last Crossover' checked.")
 tasu = input.bool(defval=true, title="Taito Suchi or any correlation", inline="option3", group="Kihon Suchi options", tooltip = "Search for an AC or BD correlation with Kihon Suchi numbers. +1/-1 also works. 26 is natural.")
 
 ac26 = input.bool(defval=false, title="26 periods after A/C", inline="option1", group="Miscellaneous options", tooltip = "The Kumo cloud between those two deadlines gives an active area to keep an eye on. Up to you to draw a bounding box there.")
@@ -306,23 +307,23 @@ drawIndicator(Wave t) =>
         line.new(time1plus26, highest, time1plus26, lowest, xloc = xloc.bar_time, color = color.orange, width=1, style=line.style_dotted)                                                                           // time A + 26 periods
         line.new(time3plus26, highest, time3plus26, lowest, xloc = xloc.bar_time, color = color.orange, width=1, style=line.style_dotted)                                                                           // time C + 26 periods
 
-    if mult and t.sWave == false
-        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice2, xloc = xloc.bar_time, color = arrowColorEY, width=1, style=line.style_arrow_right)                                                    // blue arrow 2E (highest)
-        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice2 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = arrowColorNS, width=1, style=line.style_arrow_right)                       // orange arrow 2N (prime)
-        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice3, xloc = xloc.bar_time, color = arrowColorEY, width=1, style=line.style_arrow_right)                                                    // blue arrow 3E (highest)
-        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice3 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = arrowColorNS, width=1, style=line.style_arrow_right)                       // orange arrow 3N (prime)
-        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice4, xloc = xloc.bar_time, color = arrowColorEY, width=1, style=line.style_arrow_right)                                                    // blue arrow 4E (highest)
-        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice4 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = arrowColorNS, width=1, style=line.style_arrow_right)                       // orange arrow 4N (prime)
-        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice5, xloc = xloc.bar_time, color = arrowColorEY, width=1, style=line.style_arrow_right)                                                    // blue arrow 5E (highest)
-        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice5 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = arrowColorNS, width=1, style=line.style_arrow_right)                       // orange arrow 5N (prime)
-        line.new(t.boxTime0, t.boxTopPrice2 - (t.boxTopPrice - t.price4), t.boxTime1, t.boxTopPrice2 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = arrowColorNS, width=1, style=line.style_dotted)  // level 2N
-        line.new(t.boxTime0, t.boxTopPrice2, t.boxTime1, t.boxTopPrice2, xloc = xloc.bar_time, color = arrowColorEY, width=1, style=line.style_dotted)                                                            // level 2E
-        line.new(t.boxTime0, t.boxTopPrice3 - (t.boxTopPrice - t.price4), t.boxTime1, t.boxTopPrice3 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = arrowColorNS, width=1, style=line.style_dotted)  // level 3N
-        line.new(t.boxTime0, t.boxTopPrice3, t.boxTime1, t.boxTopPrice3, xloc = xloc.bar_time, color = arrowColorEY, width=1, style=line.style_dotted)                                                            // level 3E
-        line.new(t.boxTime0, t.boxTopPrice4 - (t.boxTopPrice - t.price4), t.boxTime1, t.boxTopPrice4 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = arrowColorNS, width=1, style=line.style_dotted)  // level 4N
-        line.new(t.boxTime0, t.boxTopPrice4, t.boxTime1, t.boxTopPrice4, xloc = xloc.bar_time, color = arrowColorEY, width=1, style=line.style_dotted)                                                            // level 4E
-        line.new(t.boxTime0, t.boxTopPrice5 - (t.boxTopPrice - t.price4), t.boxTime1, t.boxTopPrice5 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = arrowColorNS, width=1, style=line.style_dotted)  // level 5N
-        line.new(t.boxTime0, t.boxTopPrice5, t.boxTime1, t.boxTopPrice5, xloc = xloc.bar_time, color = arrowColorEY, width=1, style=line.style_dotted)                                                            // level 5E
+    if mult
+        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice2, xloc = xloc.bar_time, color = arrowColorEY, width=1, style=line.style_arrow_right)                                                    // blue arrow 2Y (highest)
+        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice2 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = arrowColorNS, width=1, style=line.style_arrow_right)                       // orange arrow 2S (prime)
+        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice3, xloc = xloc.bar_time, color = arrowColorEY, width=1, style=line.style_arrow_right)                                                    // blue arrow 3Y (highest)
+        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice3 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = arrowColorNS, width=1, style=line.style_arrow_right)                       // orange arrow 3S (prime)
+        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice4, xloc = xloc.bar_time, color = arrowColorEY, width=1, style=line.style_arrow_right)                                                    // blue arrow 4Y (highest)
+        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice4 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = arrowColorNS, width=1, style=line.style_arrow_right)                       // orange arrow 4S (prime)
+        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice5, xloc = xloc.bar_time, color = arrowColorEY, width=1, style=line.style_arrow_right)                                                    // blue arrow 5Y (highest)
+        line.new(t.time3, t.price3, t.time3 + t.timeDelta1, t.boxTopPrice5 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = arrowColorNS, width=1, style=line.style_arrow_right)                       // orange arrow 5S (prime)
+        line.new(t.boxTime0, t.boxTopPrice2 - (t.boxTopPrice - t.price4), t.boxTime1, t.boxTopPrice2 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = arrowColorNS, width=1, style=line.style_dotted)  // level 2S
+        line.new(t.boxTime0, t.boxTopPrice2, t.boxTime1, t.boxTopPrice2, xloc = xloc.bar_time, color = arrowColorEY, width=1, style=line.style_dotted)                                                            // level 2Y
+        line.new(t.boxTime0, t.boxTopPrice3 - (t.boxTopPrice - t.price4), t.boxTime1, t.boxTopPrice3 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = arrowColorNS, width=1, style=line.style_dotted)  // level 3S
+        line.new(t.boxTime0, t.boxTopPrice3, t.boxTime1, t.boxTopPrice3, xloc = xloc.bar_time, color = arrowColorEY, width=1, style=line.style_dotted)                                                            // level 3Y
+        line.new(t.boxTime0, t.boxTopPrice4 - (t.boxTopPrice - t.price4), t.boxTime1, t.boxTopPrice4 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = arrowColorNS, width=1, style=line.style_dotted)  // level 4S
+        line.new(t.boxTime0, t.boxTopPrice4, t.boxTime1, t.boxTopPrice4, xloc = xloc.bar_time, color = arrowColorEY, width=1, style=line.style_dotted)                                                            // level 4Y
+        line.new(t.boxTime0, t.boxTopPrice5 - (t.boxTopPrice - t.price4), t.boxTime1, t.boxTopPrice5 - (t.boxTopPrice - t.price4), xloc = xloc.bar_time, color = arrowColorNS, width=1, style=line.style_dotted)  // level 5S
+        line.new(t.boxTime0, t.boxTopPrice5, t.boxTime1, t.boxTopPrice5, xloc = xloc.bar_time, color = arrowColorEY, width=1, style=line.style_dotted)                                                            // level 5Y
 
     line.new(t.time3 + t.timeDelta2, t.price3, t.time3 + t.timeDelta2, t.boxTopPrice, xloc = xloc.bar_time, color = arrowColorVSm, width=1, style=line.style_dashed)                                              // dashed at double correction time
 
@@ -379,16 +380,16 @@ drawIndicator(Wave t) =>
         drawArrowLabel(t.boxTime1, tim3 ? t.boxSPriceEx : t.boxSPrice,      "S=" + str.format(n4dig, tim3 ? t.boxSPriceEx : t.boxSPrice),       arrowColorNS)
         drawArrowLabel(t.boxTime1, tim3 ? t.boxSmPriceEx : t.boxSmPrice,    "Sm=" + str.format(n4dig, tim3 ? t.boxSmPriceEx : t.boxSmPrice),    arrowColorVSm)
 
-    if mult and t.sWave == false
+    if mult
         float deltaPrice4toTop = (t.boxTopPrice - t.price4)
-        drawArrowLabel(t.boxTime1, t.boxTopPrice2,                          "2E=" + str.format(n4dig, t.boxTopPrice2),                          arrowColorEY)
-        drawArrowLabel(t.boxTime1, t.boxTopPrice2 - deltaPrice4toTop,       "2N=" + str.format(n4dig, t.boxTopPrice2 - deltaPrice4toTop),       arrowColorNS)
-        drawArrowLabel(t.boxTime1, t.boxTopPrice3,                          "3E=" + str.format(n4dig, t.boxTopPrice3),                          arrowColorEY)
-        drawArrowLabel(t.boxTime1, t.boxTopPrice3 - deltaPrice4toTop,       "3N=" + str.format(n4dig, t.boxTopPrice3 - deltaPrice4toTop),       arrowColorNS)
-        drawArrowLabel(t.boxTime1, t.boxTopPrice4,                          "4E=" + str.format(n4dig, t.boxTopPrice4),                          arrowColorEY)
-        drawArrowLabel(t.boxTime1, t.boxTopPrice4 - deltaPrice4toTop,       "4N=" + str.format(n4dig, t.boxTopPrice4 - deltaPrice4toTop),       arrowColorNS)
-        drawArrowLabel(t.boxTime1, t.boxTopPrice5,                          "5E=" + str.format(n4dig, t.boxTopPrice5),                          arrowColorEY)
-        drawArrowLabel(t.boxTime1, t.boxTopPrice5 - deltaPrice4toTop,       "5N=" + str.format(n4dig, t.boxTopPrice5 - deltaPrice4toTop),       arrowColorNS)
+        drawArrowLabel(t.boxTime1, t.boxTopPrice2,                          (t.sWave ? "2Y=" : "2E=") + str.format(n4dig, t.boxTopPrice2),                          arrowColorEY)
+        drawArrowLabel(t.boxTime1, t.boxTopPrice2 - deltaPrice4toTop,       (t.sWave ? "2S=" : "2N=") + str.format(n4dig, t.boxTopPrice2 - deltaPrice4toTop),       arrowColorNS)
+        drawArrowLabel(t.boxTime1, t.boxTopPrice3,                          (t.sWave ? "3Y=" : "3E=") + str.format(n4dig, t.boxTopPrice3),                          arrowColorEY)
+        drawArrowLabel(t.boxTime1, t.boxTopPrice3 - deltaPrice4toTop,       (t.sWave ? "3S=" : "3N=") + str.format(n4dig, t.boxTopPrice3 - deltaPrice4toTop),       arrowColorNS)
+        drawArrowLabel(t.boxTime1, t.boxTopPrice4,                          (t.sWave ? "4Y=" : "4E=") + str.format(n4dig, t.boxTopPrice4),                          arrowColorEY)
+        drawArrowLabel(t.boxTime1, t.boxTopPrice4 - deltaPrice4toTop,       (t.sWave ? "4S=" : "4N=") + str.format(n4dig, t.boxTopPrice4 - deltaPrice4toTop),       arrowColorNS)
+        drawArrowLabel(t.boxTime1, t.boxTopPrice5,                          (t.sWave ? "5Y=" : "5E=") + str.format(n4dig, t.boxTopPrice5),                          arrowColorEY)
+        drawArrowLabel(t.boxTime1, t.boxTopPrice5 - deltaPrice4toTop,       (t.sWave ? "5S=" : "5N=") + str.format(n4dig, t.boxTopPrice5 - deltaPrice4toTop),       arrowColorNS)
 
     // Point D is only labeled if positionned after Time C
     if t.timeD > t.time3
@@ -412,12 +413,12 @@ drawIndicator(Wave t) =>
         drawTimeLabel(t.boxTimeE0, t.boxPriceELabels, str.format_time(t.boxTimeE0, stamp, "UTC+" + str.tostring(timeZone)), transpTimeColor, transpWhiteColor, t.priceD < t.boxPriceELabels ? label.style_label_down : label.style_label_up)
         drawTimeLabel(t.boxTimeE1, t.boxPriceELabels, str.format_time(t.boxTimeE1, stamp, "UTC+" + str.tostring(timeZone)), transpTimeColor, transpWhiteColor, t.priceD < t.boxPriceELabels ? label.style_label_down : label.style_label_up)
 
-    if ksob and kisu == false
-        int pointB = t.time2 - candleTime
+    if (ksob or ksoc) and kisu == false
+        int fromPoint = ksoc ? t.time3 - candleTime : t.time2 - candleTime
         int[] cycles = array.from(0,9,17,26,33,42,51,65,76,83,97,101,151,226)
         for i = array.size(cycles) - 1 to 0
             if array.get(cycles, i) <= ksmx 
-                cycle = (array.get(cycles, i) * candleTime) + pointB + (candleTime * ksof)
+                cycle = (array.get(cycles, i) * candleTime) + fromPoint + (candleTime * ksof)
                 if i > 0
                     line.new(cycle, math.min(y1Input, y2Input, y3Input), cycle, math.max(y1Input, y2Input, y3Input), xloc.bar_time, extend.both, color.rgb(33, 149, 243, 50), line.style_dotted, 2)
                 label.new(cycle, t.price2, str.format(n2pad, array.get(cycles, i)), xloc.bar_time, yloc.price, color.rgb(27, 32, 36, 100), label.style_label_left, color.blue )
@@ -725,7 +726,7 @@ if barstate.islastconfirmedhistory
 
 if barstate.islast
     
-    if kisu or ksob
+    if kisu or ksob or ksoc
         table.cell(tabKisu, 0, 0, "Kihon Suchi 9, 17, 26, 33, 42, 51, 65, 76,,,", 17, 3, text_color = color.yellow, text_size = size.small, bgcolor = color.rgb(61, 61, 61))
 
 // Ichimoku stuff
@@ -747,7 +748,7 @@ if crss and barstate.islastconfirmedhistory
     lastCrossoverDist = array.get(crossoverDist, array.size(crossoverBars) - 1)
 
     // Kihon Suchi Cycles
-    if kisu and ksob == false
+    if kisu and ksob == false and ksoc == false
         int[] cycles = array.from(0,9,17,26,33,42,51,65,76,83,97,101,151,226)
         for i = array.size(cycles) - 1 to 0
             if array.get(cycles, i) <= ksmx 
