@@ -36,7 +36,7 @@ wavc = input.color(defval=color.rgb(255, 255, 255, 66), title=" ", inline="optio
 wavw = input.int(defval=3, title="Width ", options=[1,2,3,4,5], inline="option0", group="Wave options")
 wavs = input.string(defval="dotted", title=" ", inline="option0", group="Wave options", options=["solid","dashed","dotted"])
 pret = input.float(defval=50.0, title="% Retracement for a P-Wave", inline="option1", group="Wave options", tooltip="By default, a P wave is forming if the move BC retraced more than 50% of AB. N waves are more certain between 33% and 50%. Alter this if you think the situation is blurry.")
-mult = input.bool(defval=false, title="Multiples of E/N waves", inline="option2", group="Wave options", tooltip="Won't work in case of an S-Wave.")
+mult = input.bool(defval=false, title="Multiples of E/N or Y/S waves", inline="option2", group="Wave options")
 tim3 = input.bool(defval=false, title="Extend to deadline", inline="option2b", group="Wave options", tooltip="Extend the strength lines to the end of the target period (aka TIME #3).")
 bcd4 = input.bool(defval=false, title="Project from BCD", inline="option3", group="Wave options", tooltip="BCD\nDraw new strength lines from D if placed after time C. Should be used when you are almost certain D is realised.")
 ebox = input.bool(defval=true, title="Expected correction (E-Box)", inline="option3b", group="Wave options")
@@ -79,6 +79,7 @@ string n4dig = "{0, number, #.####}"
 string stamp = 'dd-MMM-yyyy\nHH:mm:ss'
 
 color priceLabelBgColor = color.rgb(120, 123, 134, 90)
+color priceExLabelBgColor = color.rgb(42, 26, 44, 50)
 color transparent = color.rgb(0, 0, 0, 100)
 color boxColorBCD = color.rgb(210, 19, 98)
 color veilColor = color.rgb(255,255,255,98)
@@ -212,7 +213,7 @@ drawTargetWindow(int time1, int time2, int time3, float bottomPrice, float topPr
 drawStrengthArrow(int timeOrigin, float priceOrigin, int targetTime, float targetPrice, string bigram, color arrowColor, int time1, int time3) => 
     line.new(timeOrigin, priceOrigin, targetTime, targetPrice, xloc = xloc.bar_time, color = arrowColor, style = line.style_arrow_right, width = 1)
     line.new(time1, targetPrice, time3, targetPrice, xloc = xloc.bar_time, color=arrowColor, style=line.style_dotted, width=1)
-    label.new(time3, targetPrice, text=bigram + str.format(n4dig, targetPrice), xloc=xloc.bar_time, yloc=yloc.price, color=priceLabelBgColor, style=label.style_label_left, textcolor = arrowColor, size=size.small)
+    label.new(time3, targetPrice, text=bigram + str.format(n4dig, targetPrice), xloc=xloc.bar_time, yloc=yloc.price, color=priceExLabelBgColor, style=label.style_label_left, textcolor = arrowColor, size=size.small)
 
 // Secondary Drawing function for extended features from BCD
 drawIndicatorEx(Wave t) =>
